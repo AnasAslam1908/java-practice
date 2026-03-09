@@ -36,7 +36,7 @@ export const topics: Topic[] = [
           "Objects have state (fields) and behavior (methods)",
           "Use `new` keyword to instantiate objects"
         ],
-        interview: `"A class is a blueprint — like a cookie cutter. The object is the actual cookie. In Java, everything lives inside a class. When I built a banking app, I created an Account class once and instantiated thousands of account objects from it."`,
+        interview: `"A class is just a template. Like if I'm building a user management system, I don't write separate code for every user — I create a User class once and create objects from it. Each object has its own name, email, password but follows the same structure"`,
         code: `public class Account {
     private String owner;
     private double balance;
@@ -64,7 +64,7 @@ Account acc2 = new Account("Priya", 12000.0);`
           "Controls access to internal state",
           "Foundation of secure Java design"
         ],
-        interview: `"Make fields private, expose via getters/setters. The key insight is CONTROL — not just hiding. When balance is private, I know exactly which method modified it. In Java, this also enables validation inside setters."`,
+        interview: `"It's about protecting your data. Imagine a bank — you can't just walk in and change your balance directly. You have to go through a teller (a method). Same idea — I make sensitive fields private and expose only what's needed through getters/setters"`,
         code: `public class Employee {
     private double salary; // can't touch directly
 
@@ -88,7 +88,7 @@ Account acc2 = new Account("Priya", 12000.0);`
           "Java supports single class inheritance",
           "A class can implement multiple interfaces"
         ],
-        interview: `"Child class inherits from parent using 'extends'. I only use it for true IS-A relationships. An Admin IS-A User makes sense. Java supports single inheritance for classes but a class can implement multiple interfaces."`,
+        interview: `""Instead of copy-pasting code, I let one class borrow from another. Like if I have an Admin and a Customer — both are users, both have login/logout. So I put that in a User base class and extend it. Admin gets extra permissions on top.."`,
         code: `public class User {
     protected String name;
     protected String email;
@@ -153,7 +153,8 @@ class Calculator {
           "Java 8 added default methods to interfaces",
           "Use abstract class for shared code, interface for shared behavior"
         ],
-        interview: `"Two ways in Java — abstract classes and interfaces. Abstract class for partial implementation, interface for pure contract. Key difference: abstract class HAS state (fields), interface traditionally doesn't. Java 8 added default methods to interfaces."`,
+        interview: `"It's about hiding complexity. When I built an API layer, the caller didn't need to know whether data was coming from a database or cache. I abstracted that behind a DataService interface. The caller just says getData() and doesn't care about the rest MoreOver
+        Two ways in Java — abstract classes and interfaces. Abstract class for partial implementation, interface for pure contract. Key difference: abstract class HAS state (fields), interface traditionally doesn't. Java 8 added default methods to interfaces."`,
         code: `abstract class Vehicle {
     protected String brand;
 
