@@ -26,52 +26,54 @@ export default function DocSidebar({ activeTopic, onTopicSelect, onSectionSelect
   };
 
   return (
-    <nav className="py-4 space-y-1">
-      <div className="px-4 mb-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Topics</h2>
+    <nav className="py-5 px-3">
+      <div className="px-2 mb-4">
+        <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Documentation</h2>
       </div>
-      {topics.map((topic: Topic) => {
-        const isActive = activeTopic === topic.id;
-        const isExpanded = expandedTopics.has(topic.id);
+      <div className="space-y-0.5">
+        {topics.map((topic: Topic) => {
+          const isActive = activeTopic === topic.id;
+          const isExpanded = expandedTopics.has(topic.id);
 
-        return (
-          <div key={topic.id}>
-            <button
-              onClick={() => {
-                handleTopicClick(topic.id);
-                toggleExpand(topic.id);
-              }}
-              className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-                isActive
-                  ? "text-primary font-semibold bg-primary/5"
-                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
-              }`}
-            >
-              <span className="text-base flex-shrink-0">{topic.icon}</span>
-              <span className="flex-1 text-left">{topic.label}</span>
-              {isExpanded ? (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-              ) : (
-                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+          return (
+            <div key={topic.id}>
+              <button
+                onClick={() => {
+                  handleTopicClick(topic.id);
+                  toggleExpand(topic.id);
+                }}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-[7px] text-[13px] rounded-md transition-colors ${
+                  isActive
+                    ? "text-primary font-medium bg-primary/8"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                <span className="text-sm flex-shrink-0">{topic.icon}</span>
+                <span className="flex-1 text-left truncate">{topic.label}</span>
+                {isExpanded ? (
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                ) : (
+                  <ChevronRight className="h-3 w-3 opacity-50" />
+                )}
+              </button>
+
+              {isExpanded && (
+                <div className="ml-[18px] pl-3 border-l border-border space-y-px py-1 my-0.5">
+                  {topic.sections.map((section, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => onSectionSelect(topic.id, idx)}
+                      className="w-full text-left px-2.5 py-[5px] text-[12px] text-muted-foreground hover:text-foreground rounded-md transition-colors truncate"
+                    >
+                      {section.title}
+                    </button>
+                  ))}
+                </div>
               )}
-            </button>
-
-            {isExpanded && (
-              <div className="ml-4 pl-4 border-l border-border/50 space-y-0.5 py-1">
-                {topic.sections.map((section, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => onSectionSelect(topic.id, idx)}
-                    className="w-full text-left px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors truncate"
-                  >
-                    {section.title}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
     </nav>
   );
 }

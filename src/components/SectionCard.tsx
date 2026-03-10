@@ -10,21 +10,21 @@ interface SectionCardProps {
 
 const SectionCard = forwardRef<HTMLDivElement, SectionCardProps>(({ section, index }, ref) => {
   return (
-    <div ref={ref} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+    <div ref={ref} className="animate-fade-in" style={{ animationDelay: `${index * 40}ms` }}>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-xl font-bold text-foreground">{section.title}</h2>
-        <span className="text-[11px] font-medium text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+      <div className="flex items-baseline gap-3 mb-4">
+        <h2 className="text-lg font-semibold text-foreground tracking-tight">{section.title}</h2>
+        <span className="text-[10px] font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full whitespace-nowrap">
           {section.tag}
         </span>
       </div>
 
       {/* Key Points */}
       {section.keyPoints && section.keyPoints.length > 0 && (
-        <ul className="mb-5 space-y-1.5">
+        <ul className="mb-6 space-y-2">
           {section.keyPoints.map((point, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
-              <span className="text-primary mt-1 text-xs">●</span>
+            <li key={i} className="flex items-start gap-2.5 text-[13px] text-muted-foreground leading-relaxed">
+              <span className="text-primary mt-[3px] text-[8px]">●</span>
               <span>{point}</span>
             </li>
           ))}
@@ -32,14 +32,14 @@ const SectionCard = forwardRef<HTMLDivElement, SectionCardProps>(({ section, ind
       )}
 
       {/* Interview Answer */}
-      <div className="mb-5 rounded-lg bg-interview-bg border border-interview-border/30 p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <MessageSquareQuote className="h-4 w-4 text-primary" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-            Say this in the interview
+      <div className="mb-6 rounded-lg bg-interview-bg border border-interview-border/20 p-4">
+        <div className="flex items-center gap-2 mb-2.5">
+          <MessageSquareQuote className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-primary">
+            Interview Answer
           </span>
         </div>
-        <p className="text-sm text-foreground/80 leading-relaxed italic">
+        <p className="text-[13px] text-foreground/70 leading-relaxed italic">
           {section.interview}
         </p>
       </div>
