@@ -70,31 +70,31 @@ export default function CodeBlock({ code, language = "Java" }: CodeBlockProps) {
   };
 
   return (
-    <div className="rounded-lg border border-code-border overflow-hidden">
+    <div className="rounded-lg border border-code-border overflow-hidden shadow-sm">
       <div className="flex items-center justify-between px-4 py-2 bg-code-header border-b border-code-border">
-        <span className="text-xs font-medium text-muted-foreground font-mono">{language}</span>
+        <span className="text-[11px] font-medium text-muted-foreground font-mono tracking-wide">{language}</span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-0.5 rounded hover:bg-accent"
         >
           {copied ? (
             <>
-              <Check className="h-3.5 w-3.5 text-code-string" />
-              <span className="text-code-string">Copied!</span>
+              <Check className="h-3 w-3 text-code-string" />
+              <span className="text-code-string">Copied</span>
             </>
           ) : (
             <>
-              <Copy className="h-3.5 w-3.5" />
+              <Copy className="h-3 w-3" />
               <span>Copy</span>
             </>
           )}
         </button>
       </div>
       <div className="overflow-x-auto bg-code-bg scrollbar-thin">
-        <pre className="p-4 text-sm leading-relaxed font-mono">
+        <pre className="px-4 py-4 text-[13px] leading-[1.7] font-mono">
           {lines.map((line, i) => (
             <div key={i} className="flex">
-              <span className="select-none text-code-comment/50 w-8 text-right mr-4 text-xs leading-relaxed flex-shrink-0">
+              <span className="select-none text-code-comment/40 w-7 text-right mr-5 text-[11px] leading-[1.9] flex-shrink-0 tabular-nums">
                 {i + 1}
               </span>
               <span>
