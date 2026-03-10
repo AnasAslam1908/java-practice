@@ -1364,7 +1364,7 @@ public class GlobalExceptionHandler {
       { question: "@Transactional on a private method — does it work?", answer: "No. Spring AOP uses proxies. Private methods can't be overridden, so the proxy can't intercept them." },
       { question: "@Cacheable vs @CachePut?", answer: "@Cacheable skips the method on cache hit. @CachePut always runs and updates cache. Use @CachePut on writes to keep cache in sync." }
     ]
-  }
+  },
   {
     id: "datastructures",
     label: "Data Structures",

@@ -57,6 +57,8 @@ export default {
           strings: "hsl(var(--topic-strings))",
           spring: "hsl(var(--topic-spring))",
           annotations: "hsl(var(--topic-annotations))",
+          ds: "hsl(var(--topic-ds))",
+          db: "hsl(var(--topic-db))",
         },
         toc: {
           bg: "hsl(var(--toc-bg))",
