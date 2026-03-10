@@ -2411,4 +2411,8 @@ export const cheatSheetItems = [
   { term: "@Transactional", def: "Self-invocation = proxy bypassed!", colorClass: "topic-solid" },
   { term: "Circuit Breaker", def: "Fail fast + fallback = resilience", colorClass: "topic-interface" },
   { term: "AOP @Around", def: "Wraps entire method — most powerful", colorClass: "topic-patterns" },
+  { term: "HashMap", def: "O(1) avg, hashCode + equals", colorClass: "topic-ds" },
+  { term: "BST Inorder", def: "Left→Root→Right = sorted output", colorClass: "topic-ds" },
+  { term: "ACID", def: "Atomic, Consistent, Isolated, Durable", colorClass: "topic-db" },
+  { term: "LEFT JOIN", def: "All left rows + matching right", colorClass: "topic-db" },
 ];
