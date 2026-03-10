@@ -1364,6 +1364,1037 @@ public class GlobalExceptionHandler {
       { question: "@Transactional on a private method — does it work?", answer: "No. Spring AOP uses proxies. Private methods can't be overridden, so the proxy can't intercept them." },
       { question: "@Cacheable vs @CachePut?", answer: "@Cacheable skips the method on cache hit. @CachePut always runs and updates cache. Use @CachePut on writes to keep cache in sync." }
     ]
+  },
+  {
+    id: "datastructures",
+    label: "Data Structures",
+    icon: "🗂️",
+    colorClass: "topic-ds",
+    sections: [
+      {
+        title: "Arrays",
+        tag: "Foundation",
+        keyPoints: [
+          "Fixed-size, contiguous memory, zero-indexed",
+          "O(1) random access by index",
+          "O(n) insertion/deletion (shift elements)",
+          "Use ArrayList for dynamic sizing in Java"
+        ],
+        interview: `"Arrays store elements in contiguous memory, giving O(1) access by index. The trade-off is fixed size and O(n) insert/delete because elements must shift. In Java I use ArrayList when I need dynamic sizing — it's backed by an array that auto-resizes."`,
+        code: `// Fixed-size array
+int[] nums = new int[5];
+nums[0] = 10;
+nums[1] = 20;
+
+// Array with initializer
+String[] names = {"Alice", "Bob", "Charlie"};
+
+// Iterate
+for (int i = 0; i < names.length; i++) {
+    System.out.println(names[i]);
+}
+
+// ArrayList — dynamic array
+List<Integer> list = new ArrayList<>();
+list.add(10);       // O(1) amortized
+list.add(20);
+list.get(0);        // O(1) — random access
+list.remove(0);     // O(n) — shifts elements
+list.size();        // 1
+
+// Arrays utility
+int[] arr = {5, 3, 1, 4, 2};
+Arrays.sort(arr);                    // O(n log n)
+int idx = Arrays.binarySearch(arr, 3); // O(log n)
+Arrays.fill(arr, 0);                // fill all with 0`
+      },
+      {
+        title: "Linked List",
+        tag: "Dynamic Structure",
+        keyPoints: [
+          "Nodes linked via pointers — no contiguous memory needed",
+          "O(1) insert/delete at head; O(n) to find by index",
+          "Singly vs Doubly linked (Java's LinkedList is doubly)",
+          "Use when frequent insert/delete at ends, rare random access"
+        ],
+        interview: `"LinkedList nodes point to the next (and optionally previous) node. Insert/delete at head is O(1) — no shifting. But random access is O(n) because you must traverse. Java's LinkedList is doubly-linked and implements both List and Deque."`,
+        code: `// Java's built-in LinkedList (doubly-linked)
+LinkedList<String> list = new LinkedList<>();
+list.addFirst("A");   // O(1)
+list.addLast("C");    // O(1)
+list.add(1, "B");     // O(n) — traverse to index
+
+list.getFirst();      // O(1) — "A"
+list.get(1);          // O(n) — "B"
+
+list.removeFirst();   // O(1)
+list.removeLast();    // O(1)
+
+// Custom singly-linked node
+class ListNode {
+    int val;
+    ListNode next;
+
+    ListNode(int val) {
+        this.val = val;
+        this.next = null;
+    }
+}
+
+// Reverse a linked list — classic interview question
+ListNode reverse(ListNode head) {
+    ListNode prev = null, curr = head;
+    while (curr != null) {
+        ListNode next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev; // new head
+}`
+      },
+      {
+        title: "Stack",
+        tag: "LIFO",
+        keyPoints: [
+          "Last In, First Out (LIFO) principle",
+          "push(), pop(), peek() — all O(1)",
+          "Use Deque (ArrayDeque) instead of legacy Stack class",
+          "Use cases: undo, back button, expression evaluation, DFS"
+        ],
+        interview: `"Stack follows LIFO — last element in is first out. In Java, don't use the legacy Stack class (it extends Vector, which is synchronized). Use ArrayDeque as a stack — push/pop/peek are all O(1)."`,
+        code: `// Use ArrayDeque as Stack (preferred over Stack class)
+Deque<Integer> stack = new ArrayDeque<>();
+stack.push(10);      // add to top
+stack.push(20);
+stack.push(30);
+
+stack.peek();        // 30 — look without removing
+stack.pop();         // 30 — remove from top
+stack.isEmpty();     // false
+stack.size();        // 2
+
+// Classic: Valid Parentheses
+boolean isValid(String s) {
+    Deque<Character> stack = new ArrayDeque<>();
+    for (char c : s.toCharArray()) {
+        if (c == '(') stack.push(')');
+        else if (c == '{') stack.push('}');
+        else if (c == '[') stack.push(']');
+        else if (stack.isEmpty() || stack.pop() != c)
+            return false;
+    }
+    return stack.isEmpty();
+}
+
+isValid("({[]})"); // true
+isValid("([)]");   // false`
+      },
+      {
+        title: "Queue",
+        tag: "FIFO",
+        keyPoints: [
+          "First In, First Out (FIFO) principle",
+          "offer(), poll(), peek() — all O(1) with LinkedList/ArrayDeque",
+          "Use cases: BFS, task scheduling, message queues",
+          "LinkedList or ArrayDeque as implementation"
+        ],
+        interview: `"Queue follows FIFO — first in, first out. Like a line at a coffee shop. In Java, use LinkedList or ArrayDeque as the implementation. Key operations: offer (enqueue), poll (dequeue), peek — all O(1)."`,
+        code: `// Queue using LinkedList
+Queue<String> queue = new LinkedList<>();
+queue.offer("Task 1");   // enqueue
+queue.offer("Task 2");
+queue.offer("Task 3");
+
+queue.peek();            // "Task 1" — front, no remove
+queue.poll();            // "Task 1" — dequeue
+queue.size();            // 2
+
+// BFS using Queue — level-order traversal
+void bfs(TreeNode root) {
+    if (root == null) return;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+
+    while (!queue.isEmpty()) {
+        TreeNode node = queue.poll();
+        System.out.print(node.val + " ");
+
+        if (node.left != null)  queue.offer(node.left);
+        if (node.right != null) queue.offer(node.right);
+    }
+}`
+      },
+      {
+        title: "Deque (Double-Ended Queue)",
+        tag: "Flexible",
+        keyPoints: [
+          "Insert/remove from both front and back in O(1)",
+          "Can be used as both Stack and Queue",
+          "ArrayDeque — faster than LinkedList for most cases",
+          "Use cases: sliding window, palindrome check"
+        ],
+        interview: `"Deque supports insert/remove at both ends in O(1). ArrayDeque is the go-to implementation — faster than LinkedList due to cache locality. It can serve as both a stack (push/pop) and a queue (offerLast/pollFirst)."`,
+        code: `Deque<Integer> deque = new ArrayDeque<>();
+
+// Stack operations (use one end)
+deque.push(1);       // addFirst
+deque.pop();         // removeFirst
+
+// Queue operations (use both ends)
+deque.offerLast(1);  // enqueue at back
+deque.pollFirst();   // dequeue from front
+
+// Double-ended operations
+deque.addFirst(10);
+deque.addLast(20);
+deque.addFirst(5);
+// deque: [5, 10, 20]
+
+deque.peekFirst();   // 5
+deque.peekLast();    // 20
+deque.removeFirst(); // 5
+deque.removeLast();  // 20
+
+// Sliding Window Maximum (classic interview)
+// Use deque to track max in window of size k
+int[] maxSlidingWindow(int[] nums, int k) {
+    Deque<Integer> dq = new ArrayDeque<>(); // stores indices
+    int[] result = new int[nums.length - k + 1];
+    for (int i = 0; i < nums.length; i++) {
+        while (!dq.isEmpty() && dq.peekFirst() < i - k + 1)
+            dq.pollFirst();
+        while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i])
+            dq.pollLast();
+        dq.offerLast(i);
+        if (i >= k - 1) result[i - k + 1] = nums[dq.peekFirst()];
+    }
+    return result;
+}`
+      },
+      {
+        title: "HashMap / Hash Table",
+        tag: "Key-Value",
+        keyPoints: [
+          "O(1) average for get, put, containsKey",
+          "Uses hashCode() + equals() for key lookup",
+          "Handles collisions: chaining (Java 8: treeify at 8)",
+          "Not thread-safe — use ConcurrentHashMap for threads"
+        ],
+        interview: `"HashMap gives O(1) average lookup using hashCode. Keys must properly implement hashCode() and equals(). Java 8 converts chains to red-black trees at 8 nodes for O(log n) worst case. For thread safety, use ConcurrentHashMap."`,
+        code: `Map<String, Integer> map = new HashMap<>();
+map.put("Alice", 90);
+map.put("Bob", 85);
+
+map.get("Alice");           // 90
+map.containsKey("Bob");     // true
+map.getOrDefault("Eve", 0); // 0
+
+map.remove("Bob");
+map.size();                 // 1
+
+// Iterate
+for (Map.Entry<String, Integer> e : map.entrySet()) {
+    System.out.println(e.getKey() + ": " + e.getValue());
+}
+
+// Frequency count — most common pattern
+String s = "abracadabra";
+Map<Character, Integer> freq = new HashMap<>();
+for (char c : s.toCharArray()) {
+    freq.merge(c, 1, Integer::sum);
+}
+// {a=5, b=2, r=2, c=1, d=1}
+
+// LinkedHashMap — preserves insertion order
+Map<String, Integer> ordered = new LinkedHashMap<>();
+
+// TreeMap — sorted by key, O(log n)
+Map<String, Integer> sorted = new TreeMap<>();`
+      },
+      {
+        title: "Set",
+        tag: "Unique Elements",
+        keyPoints: [
+          "Stores unique elements only — no duplicates",
+          "HashSet: O(1) add/remove/contains, unordered",
+          "TreeSet: O(log n), sorted — backed by red-black tree",
+          "LinkedHashSet: O(1), preserves insertion order"
+        ],
+        interview: `"Set guarantees uniqueness. HashSet gives O(1) operations but no order. TreeSet gives sorted order at O(log n). LinkedHashSet preserves insertion order. Choose based on whether you need ordering."`,
+        code: `Set<String> set = new HashSet<>();
+set.add("Java");
+set.add("Python");
+set.add("Java");    // duplicate — ignored
+
+set.size();         // 2
+set.contains("Java"); // true
+set.remove("Python");
+
+// Remove duplicates from list
+List<Integer> nums = Arrays.asList(1, 2, 2, 3, 3, 4);
+List<Integer> unique = new ArrayList<>(new HashSet<>(nums));
+// [1, 2, 3, 4] — order not guaranteed
+
+// TreeSet — sorted
+Set<Integer> sorted = new TreeSet<>(Arrays.asList(5, 1, 3, 2, 4));
+// [1, 2, 3, 4, 5]
+((TreeSet<Integer>) sorted).first(); // 1
+((TreeSet<Integer>) sorted).last();  // 5
+
+// Set operations
+Set<Integer> a = new HashSet<>(Arrays.asList(1, 2, 3));
+Set<Integer> b = new HashSet<>(Arrays.asList(2, 3, 4));
+
+Set<Integer> union = new HashSet<>(a);
+union.addAll(b);        // [1, 2, 3, 4]
+
+Set<Integer> inter = new HashSet<>(a);
+inter.retainAll(b);     // [2, 3]
+
+Set<Integer> diff = new HashSet<>(a);
+diff.removeAll(b);      // [1]`
+      },
+      {
+        title: "Tree & Binary Tree",
+        tag: "Hierarchical",
+        keyPoints: [
+          "Hierarchical structure — root, children, leaves",
+          "Binary tree: each node has at most 2 children",
+          "Traversals: inorder, preorder, postorder, level-order",
+          "Height-balanced trees ensure O(log n) operations"
+        ],
+        interview: `"A tree is hierarchical — each node has zero or more children. A binary tree limits this to two. Three classic traversals: inorder (left-root-right), preorder (root-left-right), postorder (left-right-root). BFS gives level-order."`,
+        code: `class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int val) { this.val = val; }
+}
+
+// Inorder: Left → Root → Right (sorted for BST)
+void inorder(TreeNode root) {
+    if (root == null) return;
+    inorder(root.left);
+    System.out.print(root.val + " ");
+    inorder(root.right);
+}
+
+// Preorder: Root → Left → Right
+void preorder(TreeNode root) {
+    if (root == null) return;
+    System.out.print(root.val + " ");
+    preorder(root.left);
+    preorder(root.right);
+}
+
+// Max depth of binary tree
+int maxDepth(TreeNode root) {
+    if (root == null) return 0;
+    return 1 + Math.max(
+        maxDepth(root.left),
+        maxDepth(root.right)
+    );
+}
+
+// Level-order (BFS)
+List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) return result;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        int size = queue.size();
+        List<Integer> level = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            level.add(node.val);
+            if (node.left != null)  queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+        }
+        result.add(level);
+    }
+    return result;
+}`
+      },
+      {
+        title: "Binary Search Tree (BST)",
+        tag: "Sorted Tree",
+        keyPoints: [
+          "Left child < parent < right child",
+          "O(log n) search/insert/delete for balanced BSTs",
+          "Inorder traversal gives sorted output",
+          "Degenerates to O(n) if unbalanced — fix with AVL/Red-Black"
+        ],
+        interview: `"BST maintains left < root < right invariant. This gives O(log n) search when balanced. Inorder traversal of a BST gives sorted output — that's a common interview trick. If unbalanced, it degenerates to a linked list with O(n) operations."`,
+        code: `class BST {
+    TreeNode root;
+
+    // Search — O(log n) average
+    TreeNode search(TreeNode node, int target) {
+        if (node == null || node.val == target) return node;
+        if (target < node.val) return search(node.left, target);
+        return search(node.right, target);
+    }
+
+    // Insert — O(log n) average
+    TreeNode insert(TreeNode node, int val) {
+        if (node == null) return new TreeNode(val);
+        if (val < node.val)
+            node.left = insert(node.left, val);
+        else if (val > node.val)
+            node.right = insert(node.right, val);
+        return node;
+    }
+
+    // Validate BST — classic interview question
+    boolean isValidBST(TreeNode node, long min, long max) {
+        if (node == null) return true;
+        if (node.val <= min || node.val >= max) return false;
+        return isValidBST(node.left, min, node.val)
+            && isValidBST(node.right, node.val, max);
+    }
+
+    // Lowest Common Ancestor in BST
+    TreeNode lca(TreeNode root, int p, int q) {
+        if (p < root.val && q < root.val)
+            return lca(root.left, p, q);
+        if (p > root.val && q > root.val)
+            return lca(root.right, p, q);
+        return root; // split point = LCA
+    }
+}`
+      },
+      {
+        title: "Heap / Priority Queue",
+        tag: "Priority Access",
+        keyPoints: [
+          "Complete binary tree with heap property",
+          "Min-heap: parent ≤ children (Java default)",
+          "O(log n) insert/remove, O(1) peek at min/max",
+          "Use cases: top-K, median finding, Dijkstra's"
+        ],
+        interview: `"A heap is a complete binary tree where the parent is always smaller (min-heap) or larger (max-heap) than children. Java's PriorityQueue is a min-heap by default. Insert and remove are O(log n), peek is O(1). Essential for top-K problems."`,
+        code: `// Min-Heap (default in Java)
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+minHeap.offer(30);
+minHeap.offer(10);
+minHeap.offer(20);
+
+minHeap.peek();    // 10 — smallest
+minHeap.poll();    // 10 — remove smallest
+
+// Max-Heap
+PriorityQueue<Integer> maxHeap =
+    new PriorityQueue<>(Collections.reverseOrder());
+maxHeap.offer(30);
+maxHeap.offer(10);
+maxHeap.offer(20);
+maxHeap.peek();    // 30 — largest
+
+// Top K Frequent Elements — classic interview
+int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> freq = new HashMap<>();
+    for (int n : nums) freq.merge(n, 1, Integer::sum);
+
+    PriorityQueue<Map.Entry<Integer, Integer>> heap =
+        new PriorityQueue<>((a, b) -> b.getValue() - a.getValue());
+    heap.addAll(freq.entrySet());
+
+    int[] result = new int[k];
+    for (int i = 0; i < k; i++)
+        result[i] = heap.poll().getKey();
+    return result;
+}`
+      },
+      {
+        title: "Graph",
+        tag: "Connections",
+        keyPoints: [
+          "Nodes (vertices) connected by edges",
+          "Directed vs undirected, weighted vs unweighted",
+          "Representations: adjacency list (sparse) vs matrix (dense)",
+          "Traversals: BFS (shortest path), DFS (explore fully)"
+        ],
+        interview: `"A graph is nodes connected by edges. Adjacency list is preferred for sparse graphs (most real-world cases). BFS finds shortest path in unweighted graphs, DFS explores all paths. Know both iterative and recursive DFS."`,
+        code: `// Adjacency List representation
+Map<Integer, List<Integer>> graph = new HashMap<>();
+graph.put(0, Arrays.asList(1, 2));
+graph.put(1, Arrays.asList(0, 3));
+graph.put(2, Arrays.asList(0, 3));
+graph.put(3, Arrays.asList(1, 2));
+
+// BFS — shortest path in unweighted graph
+void bfs(Map<Integer, List<Integer>> graph, int start) {
+    Set<Integer> visited = new HashSet<>();
+    Queue<Integer> queue = new LinkedList<>();
+    visited.add(start);
+    queue.offer(start);
+
+    while (!queue.isEmpty()) {
+        int node = queue.poll();
+        System.out.print(node + " ");
+        for (int neighbor : graph.getOrDefault(node, List.of())) {
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                queue.offer(neighbor);
+            }
+        }
+    }
+}
+
+// DFS — recursive
+void dfs(Map<Integer, List<Integer>> graph,
+         int node, Set<Integer> visited) {
+    visited.add(node);
+    System.out.print(node + " ");
+    for (int neighbor : graph.getOrDefault(node, List.of())) {
+        if (!visited.contains(neighbor)) {
+            dfs(graph, neighbor, visited);
+        }
+    }
+}`
+      },
+      {
+        title: "Trie (Prefix Tree)",
+        tag: "String Search",
+        keyPoints: [
+          "Tree structure for efficient prefix-based string search",
+          "Each node represents a character",
+          "O(m) search/insert where m = word length",
+          "Use cases: autocomplete, spell check, IP routing"
+        ],
+        interview: `"A Trie stores strings character-by-character in a tree. Each path from root represents a prefix. Search and insert are O(m) where m is word length — independent of how many words are stored. Perfect for autocomplete and prefix matching."`,
+        code: `class TrieNode {
+    TrieNode[] children = new TrieNode[26];
+    boolean isEnd = false;
+}
+
+class Trie {
+    TrieNode root = new TrieNode();
+
+    void insert(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            int idx = c - 'a';
+            if (node.children[idx] == null)
+                node.children[idx] = new TrieNode();
+            node = node.children[idx];
+        }
+        node.isEnd = true;
+    }
+
+    boolean search(String word) {
+        TrieNode node = find(word);
+        return node != null && node.isEnd;
+    }
+
+    boolean startsWith(String prefix) {
+        return find(prefix) != null;
+    }
+
+    private TrieNode find(String s) {
+        TrieNode node = root;
+        for (char c : s.toCharArray()) {
+            int idx = c - 'a';
+            if (node.children[idx] == null) return null;
+            node = node.children[idx];
+        }
+        return node;
+    }
+}
+
+Trie trie = new Trie();
+trie.insert("apple");
+trie.search("apple");     // true
+trie.search("app");       // false
+trie.startsWith("app");   // true`
+      },
+      {
+        title: "Disjoint Set (Union-Find)",
+        tag: "Connected Components",
+        keyPoints: [
+          "Tracks connected components in a graph",
+          "Two operations: find (which set?) and union (merge sets)",
+          "Path compression + union by rank → near O(1) amortized",
+          "Use cases: Kruskal's MST, cycle detection, connected components"
+        ],
+        interview: `"Union-Find tracks which elements belong to the same group. Find returns the root of a set, Union merges two sets. With path compression and union by rank, both operations are nearly O(1). Essential for Kruskal's MST and detecting cycles in undirected graphs."`,
+        code: `class UnionFind {
+    int[] parent, rank;
+
+    UnionFind(int n) {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) parent[i] = i;
+    }
+
+    // Find with path compression
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]); // compress
+        return parent[x];
+    }
+
+    // Union by rank
+    boolean union(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px == py) return false; // already connected
+        if (rank[px] < rank[py]) parent[px] = py;
+        else if (rank[px] > rank[py]) parent[py] = px;
+        else { parent[py] = px; rank[px]++; }
+        return true;
+    }
+
+    boolean connected(int x, int y) {
+        return find(x) == find(y);
+    }
+}
+
+// Detect cycle in undirected graph
+boolean hasCycle(int n, int[][] edges) {
+    UnionFind uf = new UnionFind(n);
+    for (int[] e : edges) {
+        if (!uf.union(e[0], e[1])) return true;
+    }
+    return false;
+}`
+      }
+    ],
+    trapQuestions: [
+      { question: "When would you use LinkedList over ArrayList?", answer: "When you need frequent insertions/deletions at the head or middle. ArrayList wins for random access and iteration due to cache locality." },
+      { question: "HashMap vs TreeMap vs LinkedHashMap?", answer: "HashMap: O(1) unordered. TreeMap: O(log n) sorted by key. LinkedHashMap: O(1) insertion-ordered. Choose based on ordering needs." },
+      { question: "Why use ArrayDeque instead of Stack class?", answer: "Stack extends Vector (synchronized, slow). ArrayDeque is faster, not synchronized, and implements the Deque interface properly." },
+      { question: "What happens when HashMap exceeds load factor?", answer: "It doubles capacity and rehashes all entries. Default load factor is 0.75, initial capacity is 16." }
+    ]
+  },
+  {
+    id: "databases",
+    label: "Databases",
+    icon: "🗄️",
+    colorClass: "topic-db",
+    sections: [
+      {
+        title: "Relational Databases",
+        tag: "Foundation",
+        keyPoints: [
+          "Data stored in tables with rows and columns",
+          "Schema-defined structure with data types",
+          "Relationships via foreign keys",
+          "Examples: PostgreSQL, MySQL, Oracle, SQL Server"
+        ],
+        interview: `"A relational database organizes data into tables with predefined schemas. Tables relate to each other through foreign keys. The strength is data integrity through constraints, ACID transactions, and a powerful query language (SQL). PostgreSQL and MySQL are the most common."`,
+        code: `-- Create a table with constraints
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert data
+INSERT INTO users (email, name)
+VALUES ('john@example.com', 'John Doe');
+
+-- Query data
+SELECT id, name, email
+FROM users
+WHERE created_at > '2024-01-01'
+ORDER BY name ASC;
+
+-- Update
+UPDATE users SET name = 'Jane Doe'
+WHERE id = 1;
+
+-- Delete
+DELETE FROM users WHERE id = 1;`
+      },
+      {
+        title: "SQL vs NoSQL",
+        tag: "Key Comparison",
+        keyPoints: [
+          "SQL: structured, schema-enforced, ACID, vertical scaling",
+          "NoSQL: flexible schema, BASE, horizontal scaling",
+          "NoSQL types: document, key-value, column, graph",
+          "Choose based on data structure, scale, and consistency needs"
+        ],
+        interview: `"SQL databases enforce a schema and provide ACID guarantees — great for financial data, relationships, and complex queries. NoSQL offers flexible schemas and horizontal scaling — ideal for high-volume, rapidly evolving data like social feeds or IoT. It's not one vs the other — many systems use both."`,
+        code: `-- SQL: Structured, relational
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    total DECIMAL(10,2),
+    status VARCHAR(20)
+);
+
+SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+JOIN orders o ON u.id = o.user_id
+GROUP BY u.name;
+
+-- NoSQL (MongoDB-style document)
+-- {
+--   "_id": "abc123",
+--   "name": "John",
+--   "orders": [
+--     { "total": 99.99, "status": "shipped" },
+--     { "total": 45.00, "status": "delivered" }
+--   ]
+-- }
+
+-- When to use what:
+-- SQL:   Banking, ERP, e-commerce (relationships matter)
+-- NoSQL: Real-time analytics, content mgmt, IoT
+--        (flexibility + scale matter)`
+      },
+      {
+        title: "Primary Key & Foreign Key",
+        tag: "Constraints",
+        keyPoints: [
+          "Primary key: uniquely identifies each row, cannot be NULL",
+          "Foreign key: references primary key of another table",
+          "Composite key: multiple columns forming the primary key",
+          "Foreign keys enforce referential integrity"
+        ],
+        interview: `"A primary key uniquely identifies each row — it must be unique and non-null. A foreign key creates a relationship by referencing another table's primary key. This enforces referential integrity — you can't insert an order for a user that doesn't exist."`,
+        code: `-- Primary Key
+CREATE TABLE users (
+    id INT PRIMARY KEY,        -- unique, not null
+    email VARCHAR(255) UNIQUE  -- also unique, but not PK
+);
+
+-- Composite Primary Key
+CREATE TABLE enrollments (
+    student_id INT,
+    course_id INT,
+    enrolled_at DATE,
+    PRIMARY KEY (student_id, course_id)  -- composite
+);
+
+-- Foreign Key with constraints
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    total DECIMAL(10,2),
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE      -- delete orders if user deleted
+        ON UPDATE CASCADE      -- update FK if PK changes
+);
+
+-- This will FAIL if user_id 999 doesn't exist:
+INSERT INTO orders (user_id, total)
+VALUES (999, 49.99);  -- ERROR: foreign key violation`
+      },
+      {
+        title: "Indexes",
+        tag: "Performance",
+        keyPoints: [
+          "Speed up SELECT queries at the cost of slower writes",
+          "B-Tree index: default, good for range queries and equality",
+          "Hash index: O(1) equality lookups only",
+          "Composite index: multi-column, leftmost prefix rule"
+        ],
+        interview: `"An index is like a book's index — instead of scanning every page, you jump to the right one. B-Tree indexes handle both equality and range queries. The trade-off: faster reads but slower writes because the index must be updated. Don't over-index — each index costs storage and write performance."`,
+        code: `-- Create index on frequently queried column
+CREATE INDEX idx_users_email ON users(email);
+
+-- Composite index — order matters!
+CREATE INDEX idx_orders_user_date
+ON orders(user_id, created_at);
+
+-- This query USES the composite index:
+SELECT * FROM orders
+WHERE user_id = 5 AND created_at > '2024-01-01';
+
+-- This also uses it (leftmost prefix):
+SELECT * FROM orders WHERE user_id = 5;
+
+-- This does NOT use it (skips leftmost column):
+SELECT * FROM orders WHERE created_at > '2024-01-01';
+
+-- Unique index — enforces uniqueness
+CREATE UNIQUE INDEX idx_unique_email
+ON users(email);
+
+-- Check if index is being used
+EXPLAIN ANALYZE
+SELECT * FROM users WHERE email = 'john@example.com';
+-- Look for "Index Scan" vs "Seq Scan"
+
+-- Drop index
+DROP INDEX idx_users_email;`
+      },
+      {
+        title: "Normalization",
+        tag: "Design",
+        keyPoints: [
+          "1NF: atomic values, no repeating groups",
+          "2NF: 1NF + no partial dependencies on composite keys",
+          "3NF: 2NF + no transitive dependencies",
+          "Denormalize strategically for read-heavy workloads"
+        ],
+        interview: `"Normalization reduces data redundancy. 1NF means atomic values. 2NF eliminates partial dependencies. 3NF removes transitive dependencies. In practice, I normalize for write-heavy systems and denormalize for read-heavy ones — it's a trade-off between consistency and performance."`,
+        code: `-- UNNORMALIZED (bad)
+-- | order_id | customer | items           |
+-- | 1        | John     | iPhone, AirPods |
+
+-- 1NF: Atomic values, no repeating groups
+CREATE TABLE orders_1nf (
+    order_id INT,
+    customer VARCHAR(100),
+    item VARCHAR(100),
+    PRIMARY KEY (order_id, item)
+);
+
+-- 2NF: Remove partial dependencies
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+CREATE TABLE orders_2nf (
+    id INT PRIMARY KEY,
+    customer_id INT REFERENCES customers(id)
+);
+
+CREATE TABLE order_items (
+    order_id INT REFERENCES orders_2nf(id),
+    item VARCHAR(100),
+    price DECIMAL(10,2),
+    PRIMARY KEY (order_id, item)
+);
+
+-- 3NF: Remove transitive dependencies
+-- Bad: orders has zip_code AND city (city depends on zip)
+-- Fix: separate address table`
+      },
+      {
+        title: "ACID Properties",
+        tag: "Transactions",
+        keyPoints: [
+          "Atomicity: all or nothing — partial commits impossible",
+          "Consistency: DB moves from one valid state to another",
+          "Isolation: concurrent transactions don't interfere",
+          "Durability: committed data survives crashes"
+        ],
+        interview: `"ACID guarantees reliable transactions. Atomicity means all-or-nothing. Consistency ensures valid state transitions. Isolation prevents concurrent transactions from interfering. Durability means committed data survives crashes. This is why banks use relational databases."`,
+        code: `-- ACID in action: Bank Transfer
+BEGIN TRANSACTION;
+
+-- Debit from Account A
+UPDATE accounts SET balance = balance - 500
+WHERE id = 1 AND balance >= 500;
+
+-- Credit to Account B
+UPDATE accounts SET balance = balance + 500
+WHERE id = 2;
+
+-- If both succeed → COMMIT
+COMMIT;
+
+-- If anything fails → ROLLBACK (Atomicity)
+-- ROLLBACK;
+
+-- Isolation levels (weakest to strongest):
+-- READ UNCOMMITTED  → dirty reads possible
+-- READ COMMITTED    → no dirty reads (PostgreSQL default)
+-- REPEATABLE READ   → no non-repeatable reads (MySQL default)
+-- SERIALIZABLE      → full isolation, slowest
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
+      },
+      {
+        title: "Joins",
+        tag: "Combining Data",
+        keyPoints: [
+          "INNER JOIN: only matching rows from both tables",
+          "LEFT JOIN: all from left + matching from right",
+          "RIGHT JOIN: all from right + matching from left",
+          "FULL OUTER JOIN: all rows from both tables"
+        ],
+        interview: `"INNER JOIN returns only matching rows. LEFT JOIN returns everything from the left table plus matches from the right — unmatched rows get NULLs. This is the most common in practice. FULL OUTER JOIN returns everything from both sides."`,
+        code: `-- Sample data
+-- users: {1, Alice}, {2, Bob}, {3, Charlie}
+-- orders: {101, user_id=1}, {102, user_id=1}, {103, user_id=4}
+
+-- INNER JOIN: only matches
+SELECT u.name, o.id as order_id
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id;
+-- Alice, 101  |  Alice, 102
+-- (Bob excluded — no orders)
+-- (order 103 excluded — no user 4)
+
+-- LEFT JOIN: all users + their orders
+SELECT u.name, o.id as order_id
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id;
+-- Alice, 101  |  Alice, 102
+-- Bob, NULL   |  Charlie, NULL
+
+-- RIGHT JOIN: all orders + their users
+SELECT u.name, o.id as order_id
+FROM users u
+RIGHT JOIN orders o ON u.id = o.user_id;
+-- Alice, 101  |  Alice, 102  |  NULL, 103
+
+-- FULL OUTER JOIN: everything
+SELECT u.name, o.id as order_id
+FROM users u
+FULL OUTER JOIN orders o ON u.id = o.user_id;
+
+-- Self Join: employees with their managers
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;`
+      },
+      {
+        title: "Isolation Levels",
+        tag: "Concurrency",
+        keyPoints: [
+          "READ UNCOMMITTED: fastest, allows dirty reads",
+          "READ COMMITTED: prevents dirty reads (PostgreSQL default)",
+          "REPEATABLE READ: prevents non-repeatable reads (MySQL default)",
+          "SERIALIZABLE: full isolation, highest consistency, lowest throughput"
+        ],
+        interview: `"Isolation levels control the trade-off between consistency and performance. READ COMMITTED prevents dirty reads — you only see committed data. REPEATABLE READ ensures you see the same data if you query twice in one transaction. SERIALIZABLE is the strictest — transactions behave as if they run one at a time."`,
+        code: `-- Dirty Read (READ UNCOMMITTED)
+-- T1: UPDATE accounts SET balance = 0 WHERE id = 1;
+-- T2: SELECT balance FROM accounts WHERE id = 1; → sees 0
+-- T1: ROLLBACK;
+-- T2 read uncommitted data! (dirty read)
+
+-- Non-Repeatable Read (READ COMMITTED)
+-- T1: SELECT balance WHERE id = 1; → 1000
+-- T2: UPDATE balance = 500 WHERE id = 1; COMMIT;
+-- T1: SELECT balance WHERE id = 1; → 500 (changed!)
+
+-- Phantom Read (REPEATABLE READ)
+-- T1: SELECT * WHERE age > 25; → 5 rows
+-- T2: INSERT INTO users (age) VALUES (30); COMMIT;
+-- T1: SELECT * WHERE age > 25; → 6 rows (phantom!)
+
+-- Set isolation level
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+BEGIN;
+SELECT * FROM inventory WHERE product_id = 1;
+-- No other transaction can modify this row
+UPDATE inventory SET qty = qty - 1 WHERE product_id = 1;
+COMMIT;`
+      },
+      {
+        title: "CAP Theorem",
+        tag: "Distributed Systems",
+        keyPoints: [
+          "Consistency: every read gets the latest write",
+          "Availability: every request gets a response",
+          "Partition Tolerance: system works despite network failures",
+          "You can only guarantee 2 out of 3 during a partition"
+        ],
+        interview: `"CAP theorem says in a distributed system during a network partition, you must choose between consistency and availability. CP systems (like HBase) reject requests to stay consistent. AP systems (like Cassandra) serve stale data to stay available. In practice, it's about the trade-off during failures."`,
+        code: `-- CAP Theorem — pick 2 during a partition
+--
+-- CP (Consistency + Partition Tolerance):
+--   • HBase, MongoDB (with majority reads)
+--   • Rejects requests if can't guarantee latest data
+--   • Use for: banking, inventory
+--
+-- AP (Availability + Partition Tolerance):
+--   • Cassandra, DynamoDB, CouchDB
+--   • Always responds, may serve stale data
+--   • Use for: social media feeds, analytics
+--
+-- CA (Consistency + Availability):
+--   • Traditional RDBMS (single node)
+--   • Not partition-tolerant — not truly distributed
+--
+-- Real-world example:
+-- Shopping cart (AP): better to show slightly stale cart
+--   than show an error page
+-- Payment processing (CP): better to reject than
+--   double-charge
+
+-- Most systems are "eventually consistent" (AP)
+-- with tunable consistency levels`
+      },
+      {
+        title: "Sharding",
+        tag: "Horizontal Scaling",
+        keyPoints: [
+          "Split data across multiple database instances",
+          "Shard key determines which shard stores each row",
+          "Horizontal scaling — add more machines, not bigger ones",
+          "Challenges: cross-shard queries, rebalancing, hotspots"
+        ],
+        interview: `"Sharding splits data horizontally across multiple databases. Each shard holds a subset of the data based on a shard key. It enables horizontal scaling — handling more data by adding machines. The challenge is choosing the right shard key to avoid hotspots and making cross-shard queries efficient."`,
+        code: `-- Sharding by user_id (range-based)
+-- Shard 1: user_id 1 - 1,000,000
+-- Shard 2: user_id 1,000,001 - 2,000,000
+-- Shard 3: user_id 2,000,001 - 3,000,000
+
+-- Sharding by hash
+-- shard = hash(user_id) % num_shards
+-- Distributes evenly but range queries are hard
+
+-- Application-level routing
+-- int shard = userId % NUM_SHARDS;
+-- DataSource ds = shardMap.get(shard);
+-- ds.query("SELECT * FROM orders WHERE user_id = ?", userId);
+
+-- Challenges:
+-- 1. Cross-shard JOINs are expensive
+-- 2. Auto-increment IDs need global coordination
+-- 3. Rebalancing when adding shards
+-- 4. Hot spots if shard key has skewed distribution
+
+-- Shard key selection:
+-- Good: user_id (even distribution)
+-- Bad:  country (US shard overloaded)
+-- Bad:  created_at (latest shard always hot)`
+      },
+      {
+        title: "Replication",
+        tag: "High Availability",
+        keyPoints: [
+          "Copy data across multiple servers for redundancy",
+          "Master-slave: one writer, multiple readers",
+          "Master-master: multiple writers (conflict resolution needed)",
+          "Synchronous vs asynchronous replication trade-offs"
+        ],
+        interview: `"Replication copies data across servers for high availability and read scaling. Master-slave is most common — writes go to the master, reads can go to any replica. The trade-off is replication lag — a read from a replica might return slightly stale data. Synchronous replication eliminates lag but adds write latency."`,
+        code: `-- Master-Slave Replication
+--
+-- [Client] → WRITE → [Master]
+--                       ↓ (replicate)
+-- [Client] → READ  → [Slave 1]
+-- [Client] → READ  → [Slave 2]
+--
+-- Benefits:
+-- • Read scaling: distribute reads across replicas
+-- • Failover: promote slave to master if master dies
+-- • Backups: backup from slave without affecting master
+
+-- Replication Lag
+-- Master: UPDATE users SET name='Jane' WHERE id=1;
+-- Slave (100ms later): still shows 'John'
+-- Solution: read-after-write from master
+
+-- Synchronous vs Async
+-- Sync:  Master waits for slave ACK → consistent, slower
+-- Async: Master doesn't wait → faster, risk of data loss
+-- Semi-sync: Wait for at least 1 slave → compromise
+
+-- PostgreSQL streaming replication config:
+-- primary: wal_level = replica
+-- replica: primary_conninfo = 'host=master port=5432'`
+      }
+    ],
+    trapQuestions: [
+      { question: "When would you denormalize a database?", answer: "For read-heavy workloads where JOIN performance is a bottleneck. Common in analytics, dashboards, and caching layers. Accept data redundancy for query speed." },
+      { question: "Can you have both ACID and horizontal scaling?", answer: "It's very hard. Google Spanner does it with TrueTime. CockroachDB approximates it. Most systems sacrifice strict consistency for scalability (eventual consistency)." },
+      { question: "INDEX on every column — good idea?", answer: "No. Each index slows writes and uses storage. Only index columns used in WHERE, JOIN, and ORDER BY clauses that are queried frequently." },
+      { question: "LEFT JOIN vs LEFT OUTER JOIN?", answer: "They're identical. OUTER is optional syntax. Same for RIGHT JOIN = RIGHT OUTER JOIN." }
+    ]
   }
 ];
 
@@ -1380,4 +2411,8 @@ export const cheatSheetItems = [
   { term: "@Transactional", def: "Self-invocation = proxy bypassed!", colorClass: "topic-solid" },
   { term: "Circuit Breaker", def: "Fail fast + fallback = resilience", colorClass: "topic-interface" },
   { term: "AOP @Around", def: "Wraps entire method — most powerful", colorClass: "topic-patterns" },
+  { term: "HashMap", def: "O(1) avg, hashCode + equals", colorClass: "topic-ds" },
+  { term: "BST Inorder", def: "Left→Root→Right = sorted output", colorClass: "topic-ds" },
+  { term: "ACID", def: "Atomic, Consistent, Isolated, Durable", colorClass: "topic-db" },
+  { term: "LEFT JOIN", def: "All left rows + matching right", colorClass: "topic-db" },
 ];
