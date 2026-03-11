@@ -59,6 +59,7 @@ export default {
           annotations: "hsl(var(--topic-annotations))",
           ds: "hsl(var(--topic-ds))",
           db: "hsl(var(--topic-db))",
+          micro: "hsl(var(--topic-micro))",
         },
         toc: {
           bg: "hsl(var(--toc-bg))",
