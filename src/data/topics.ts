@@ -2395,6 +2395,545 @@ COMMIT;`
       { question: "INDEX on every column — good idea?", answer: "No. Each index slows writes and uses storage. Only index columns used in WHERE, JOIN, and ORDER BY clauses that are queried frequently." },
       { question: "LEFT JOIN vs LEFT OUTER JOIN?", answer: "They're identical. OUTER is optional syntax. Same for RIGHT JOIN = RIGHT OUTER JOIN." }
     ]
+  },
+  {
+    id: "microservices",
+    label: "Microservices & Spring Cloud",
+    icon: "☁️",
+    colorClass: "topic-micro",
+    sections: [
+      {
+        title: "Microservices Architecture",
+        tag: "Foundation",
+        keyPoints: [
+          "Services are independently deployable",
+          "Each service focuses on one business capability",
+          "Services communicate using REST APIs or message brokers",
+          "Enables independent scaling"
+        ],
+        interview: `"Microservices architecture is a software design approach where a large application is divided into small independent services. Each service handles a specific business capability and communicates with other services using APIs or messaging."`,
+        code: `// Instead of one monolithic e-commerce application:
+// User Service       → handles user registration, login
+// Order Service      → handles order creation, tracking
+// Payment Service    → handles payment processing
+// Inventory Service  → handles stock management
+
+// Each service runs as its own Spring Boot application
+@SpringBootApplication
+public class UserServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
+}
+
+@SpringBootApplication
+public class OrderServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderServiceApplication.class, args);
+    }
+}`
+      },
+      {
+        title: "Spring Cloud",
+        tag: "Framework",
+        keyPoints: [
+          "Provides tools for building distributed systems",
+          "Solves configuration management, service discovery, fault tolerance",
+          "Built on top of Spring Boot",
+          "Integrates with Netflix OSS, Resilience4j, and more"
+        ],
+        interview: `"Spring Cloud provides tools and frameworks for building distributed systems and microservices. It solves common microservice challenges such as configuration management, service discovery, and fault tolerance."`,
+        code: `// Core Spring Cloud dependencies (pom.xml)
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>2023.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+// Key modules:
+// spring-cloud-config       → centralized configuration
+// spring-cloud-netflix      → Eureka service discovery
+// spring-cloud-openfeign    → declarative REST clients
+// spring-cloud-gateway      → API gateway
+// spring-cloud-circuitbreaker → fault tolerance`
+      },
+      {
+        title: "Config Server",
+        tag: "Configuration",
+        keyPoints: [
+          "Centralized configuration management for all microservices",
+          "Configuration stored in Git repository",
+          "Services fetch config at runtime",
+          "Supports environment-specific profiles"
+        ],
+        interview: `"A Config Server provides centralized configuration management for microservices. Configuration files are stored in a central repository such as Git and fetched by services at runtime."`,
+        code: `@EnableConfigServer
+@SpringBootApplication
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}
+
+// application.properties
+server.port=8888
+spring.cloud.config.server.git.uri=https://github.com/config-repo`
+      },
+      {
+        title: "Config Client",
+        tag: "Configuration",
+        keyPoints: [
+          "Microservice that retrieves config from Config Server",
+          "Uses bootstrap.properties to locate Config Server",
+          "Config loaded before application context starts",
+          "Supports dynamic refresh with @RefreshScope"
+        ],
+        interview: `"A Config Client is a microservice that retrieves its configuration from the Config Server during startup. It connects using the Config Server URI defined in bootstrap.properties."`,
+        code: `// bootstrap.properties
+spring.application.name=user-service
+spring.cloud.config.uri=http://localhost:8888
+
+// The Config Server will serve:
+// /{application}/{profile}
+// e.g., /user-service/dev → user-service-dev.properties
+
+@RefreshScope
+@RestController
+public class UserController {
+    @Value("\${greeting.message}")
+    private String message;
+
+    @GetMapping("/greeting")
+    public String greet() {
+        return message;
+    }
+}`
+      },
+      {
+        title: "Service Discovery",
+        tag: "Discovery",
+        keyPoints: [
+          "Allows services to dynamically locate each other",
+          "No hardcoded IP addresses or ports",
+          "Services register themselves on startup",
+          "Clients query registry to find service instances"
+        ],
+        interview: `"Service discovery allows microservices to dynamically locate other services without hardcoding their IP addresses. Services register with a registry on startup and other services look them up by name."`,
+        code: `// Without service discovery:
+String url = "http://192.168.1.50:8081/users";  // hardcoded!
+
+// With service discovery:
+String url = "http://user-service/users";  // resolved dynamically
+
+// Flow:
+// 1. user-service starts → registers with Eureka
+// 2. order-service needs user-service
+// 3. order-service asks Eureka: "Where is user-service?"
+// 4. Eureka returns: 192.168.1.50:8081
+// 5. order-service calls that address`
+      },
+      {
+        title: "Eureka Server",
+        tag: "Service Registry",
+        keyPoints: [
+          "Service registry that tracks all running microservices",
+          "Services send periodic heartbeats",
+          "Removes services that stop sending heartbeats",
+          "Provides a dashboard to view registered services"
+        ],
+        interview: `"Eureka Server is a service registry that keeps track of all running microservices in the system. Each service registers itself and sends heartbeats to indicate it's alive."`,
+        code: `@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+
+// application.properties
+server.port=8761
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+
+// Dashboard available at http://localhost:8761`
+      },
+      {
+        title: "Eureka Client",
+        tag: "Service Registry",
+        keyPoints: [
+          "Microservice that registers itself with Eureka Server",
+          "Discovers other services by their registered name",
+          "Sends heartbeats to maintain registration",
+          "Automatically deregisters on shutdown"
+        ],
+        interview: `"A Eureka Client is a microservice that registers itself with the Eureka Server and discovers other services. It uses the service name instead of hardcoded URLs."`,
+        code: `// application.properties
+spring.application.name=user-service
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class UserServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
+}
+
+// Now other services can call:
+// http://user-service/users  → resolved by Eureka`
+      },
+      {
+        title: "OpenFeign",
+        tag: "Communication",
+        keyPoints: [
+          "Declarative REST client for inter-service communication",
+          "Define interface + annotations, Spring implements it",
+          "Integrates with Eureka for service discovery",
+          "Supports load balancing automatically"
+        ],
+        interview: `"OpenFeign is a declarative REST client used to simplify communication between microservices. You define an interface with annotations and Spring generates the implementation."`,
+        code: `@FeignClient(name = "user-service")
+public interface UserClient {
+
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable Long id);
+
+    @PostMapping("/users")
+    User createUser(@RequestBody User user);
+}
+
+// Usage in OrderService
+@Service
+public class OrderService {
+    @Autowired
+    private UserClient userClient;
+
+    public Order createOrder(Long userId) {
+        User user = userClient.getUser(userId);
+        return new Order(user, LocalDateTime.now());
+    }
+}`
+      },
+      {
+        title: "Circuit Breaker",
+        tag: "Fault Tolerance",
+        keyPoints: [
+          "Prevents repeated calls to a failing service",
+          "Three states: Closed (normal), Open (failing), Half-Open (testing)",
+          "Returns fallback responses when circuit is open",
+          "Protects system from cascading failures"
+        ],
+        interview: `"A Circuit Breaker prevents repeated calls to a failing service. When failures exceed a threshold, the circuit opens and fallback responses are returned instead."`,
+        code: `// Circuit Breaker States:
+// CLOSED    → requests flow normally
+// OPEN      → requests blocked, fallback returned
+// HALF-OPEN → limited requests to test recovery
+
+// Failure threshold reached → CLOSED → OPEN
+// Wait duration expires     → OPEN → HALF-OPEN
+// Test requests succeed     → HALF-OPEN → CLOSED
+// Test requests fail        → HALF-OPEN → OPEN
+
+// Without circuit breaker:
+// Service A → Service B (down) → timeout → retry → timeout
+// Thread pool exhausted → Service A also fails!
+
+// With circuit breaker:
+// Service A → Circuit Breaker → fallback response (instant)`
+      },
+      {
+        title: "Resilience4j",
+        tag: "Fault Tolerance",
+        keyPoints: [
+          "Lightweight fault tolerance library for Spring Boot",
+          "Implements Circuit Breaker, Retry, Rate Limiter, Bulkhead",
+          "Annotation-driven with @CircuitBreaker, @Retry",
+          "Replaces Netflix Hystrix (deprecated)"
+        ],
+        interview: `"Resilience4j is a lightweight fault tolerance library used with Spring Boot to implement patterns such as Circuit Breaker, Retry, Rate Limiter, and Bulkhead. It replaced the deprecated Netflix Hystrix."`,
+        code: `@CircuitBreaker(name = "userService", fallbackMethod = "fallbackUser")
+public User getUser(Long id) {
+    return userClient.getUser(id);
+}
+
+public User fallbackUser(Long id, Exception ex) {
+    return new User(id, "Fallback User");
+}
+
+// Retry pattern
+@Retry(name = "userService", fallbackMethod = "fallbackUser")
+public User getUserWithRetry(Long id) {
+    return userClient.getUser(id);
+}
+
+// application.yml configuration
+// resilience4j.circuitbreaker.instances.userService:
+//   sliding-window-size: 10
+//   failure-rate-threshold: 50
+//   wait-duration-in-open-state: 5s`
+      },
+      {
+        title: "API Gateway",
+        tag: "Routing",
+        keyPoints: [
+          "Single entry point for all client requests",
+          "Routes requests to appropriate microservices",
+          "Handles cross-cutting concerns: auth, rate limiting, logging",
+          "Spring Cloud Gateway is the recommended implementation"
+        ],
+        interview: `"An API Gateway acts as the single entry point for all client requests and routes them to appropriate microservices. It handles authentication, rate limiting, and request aggregation."`,
+        code: `@SpringBootApplication
+public class GatewayApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+}
+
+// application.yml
+// spring.cloud.gateway.routes:
+//   - id: user-service
+//     uri: lb://user-service
+//     predicates:
+//       - Path=/api/users/**
+//   - id: order-service
+//     uri: lb://order-service
+//     predicates:
+//       - Path=/api/orders/**
+
+// Client → Gateway (port 8080)
+//   /api/users/1   → routed to user-service
+//   /api/orders/5  → routed to order-service`
+      },
+      {
+        title: "Message Queues",
+        tag: "Async Communication",
+        keyPoints: [
+          "Enable asynchronous communication between microservices",
+          "Loose coupling — sender doesn't wait for receiver",
+          "Improved scalability and resilience",
+          "Common implementations: Kafka, RabbitMQ"
+        ],
+        interview: `"Message queues enable asynchronous communication between microservices. Instead of directly calling another service, a service sends a message to a queue which is processed by another service independently."`,
+        code: `// Synchronous (tight coupling)
+// Order Service → calls → Payment Service (blocks)
+
+// Asynchronous with message queue (loose coupling)
+// Order Service → publishes message → Queue
+// Payment Service → consumes message → processes
+
+// Benefits:
+// 1. Order Service doesn't wait for Payment Service
+// 2. If Payment Service is down, message stays in queue
+// 3. Multiple consumers can process in parallel
+// 4. Easy to add new consumers without changing producer`
+      },
+      {
+        title: "Apache Kafka",
+        tag: "Event Streaming",
+        keyPoints: [
+          "Distributed event streaming platform",
+          "High-throughput, fault-tolerant messaging",
+          "Key concepts: Producer, Consumer, Topic, Broker",
+          "Used for event-driven architectures and real-time pipelines"
+        ],
+        interview: `"Apache Kafka is a distributed event streaming platform used for high-throughput, fault-tolerant messaging between services. Producers publish events to topics, and multiple consumers can independently read from those topics."`,
+        code: `// Kafka Producer
+@Service
+public class OrderProducer {
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    public void publishOrder(Order order) {
+        kafkaTemplate.send("orders", "Order Created: " + order.getId());
+    }
+}
+
+// Kafka Consumer
+@Service
+public class InventoryConsumer {
+    @KafkaListener(topics = "orders", groupId = "inventory-group")
+    public void handleOrder(String message) {
+        System.out.println("Updating inventory: " + message);
+    }
+}
+
+// Flow: Order Service → Topic "orders" → Inventory Service
+//                                       → Notification Service`
+      },
+      {
+        title: "RabbitMQ",
+        tag: "Message Broker",
+        keyPoints: [
+          "Message broker for reliable service communication",
+          "Key concepts: Producer, Queue, Consumer, Exchange",
+          "Exchange routes messages to appropriate queues",
+          "Supports multiple routing strategies (direct, topic, fanout)"
+        ],
+        interview: `"RabbitMQ is a message broker that enables reliable communication between services using queues and message routing. Producers send messages to an exchange which routes them to the appropriate queue."`,
+        code: `// RabbitMQ Producer
+@Service
+public class OrderPublisher {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void publishOrder(Order order) {
+        rabbitTemplate.convertAndSend(
+            "order.exchange", "order.created", order
+        );
+    }
+}
+
+// RabbitMQ Consumer
+@Service
+public class NotificationConsumer {
+    @RabbitListener(queues = "order.queue")
+    public void handleOrder(Order order) {
+        System.out.println("Sending email for: " + order.getId());
+    }
+}
+
+// Flow: Producer → Exchange → Queue → Consumer`
+      },
+      {
+        title: "Event-Driven Architecture",
+        tag: "Design Pattern",
+        keyPoints: [
+          "Services communicate by publishing and subscribing to events",
+          "No direct synchronous API calls between services",
+          "Enables loose coupling and independent scaling",
+          "Works with Kafka, RabbitMQ, or other message brokers"
+        ],
+        interview: `"Event-driven architecture is a design pattern where services communicate by publishing and subscribing to events instead of direct synchronous API calls. Multiple services can react to the same event independently."`,
+        code: `// Event-driven flow:
+// Order Service publishes → OrderCreatedEvent
+
+// Consumers react independently:
+// Inventory Service → updates stock
+// Notification Service → sends confirmation email
+// Analytics Service → records metrics
+
+@Service
+public class OrderService {
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    public void createOrder(Order order) {
+        orderRepository.save(order);
+        publisher.publishEvent(new OrderCreatedEvent(order));
+    }
+}
+
+@EventListener
+public void onOrderCreated(OrderCreatedEvent event) {
+    inventoryService.updateStock(event.getOrder());
+}`
+      },
+      {
+        title: "Distributed Tracing",
+        tag: "Observability",
+        keyPoints: [
+          "Tracks requests across multiple microservices",
+          "Assigns unique trace IDs to each request flow",
+          "Helps debug performance issues in distributed systems",
+          "Common tools: Zipkin, Jaeger, Spring Cloud Sleuth"
+        ],
+        interview: `"Distributed tracing tracks a request as it flows through multiple microservices. It assigns a unique trace ID so developers can follow the entire request path and identify bottlenecks."`,
+        code: `// Without tracing:
+// "Why is the /orders endpoint slow?"
+// Is it Order Service? User Service? Payment Service?
+
+// With distributed tracing (Zipkin + Sleuth):
+// Trace ID: abc-123 follows the request everywhere
+
+// Gateway → Order Service → User Service → Payment Service
+// abc-123    abc-123         abc-123        abc-123
+
+// application.properties
+spring.application.name=order-service
+spring.sleuth.sampler.probability=1.0
+spring.zipkin.base-url=http://localhost:9411
+
+// Each log includes trace ID:
+// [order-service, abc-123, span-456] Processing order...`
+      },
+      {
+        title: "Saga Pattern",
+        tag: "Transactions",
+        keyPoints: [
+          "Manages distributed transactions across microservices",
+          "Sequence of local transactions with compensating actions",
+          "Two types: Choreography (event-based) and Orchestration (coordinator)",
+          "Compensating transaction = rollback action"
+        ],
+        interview: `"Saga Pattern manages distributed transactions across microservices using a sequence of local transactions with compensating actions. If any step fails, previous steps are rolled back."`,
+        code: `// Distributed transaction problem:
+// Order → Payment → Inventory (all must succeed or rollback)
+// Can't use @Transactional across services!
+
+// Saga Pattern solution:
+// Step 1: Order Service → creates order (PENDING)
+// Step 2: Payment Service → processes payment
+// Step 3: Inventory Service → updates stock
+
+// If Payment fails → compensate → cancel order
+
+@Service
+public class OrderSagaOrchestrator {
+    public void createOrderSaga(Order order) {
+        try {
+            orderService.createOrder(order);
+            paymentService.processPayment(order);
+            inventoryService.updateStock(order);
+        } catch (PaymentException e) {
+            orderService.cancelOrder(order);  // compensate
+        }
+    }
+}`
+      },
+      {
+        title: "Load Balancing",
+        tag: "Scalability",
+        keyPoints: [
+          "Distributes requests across multiple service instances",
+          "Improves availability and performance",
+          "Client-side: Spring Cloud LoadBalancer",
+          "Server-side: Nginx, HAProxy, cloud load balancers"
+        ],
+        interview: `"Load balancing distributes incoming requests across multiple instances of a service to improve availability and performance. Spring Cloud LoadBalancer provides client-side load balancing with Eureka."`,
+        code: `// Without load balancing:
+// All requests → single instance (overloaded!)
+
+// With load balancing:
+// Request 1 → Instance A (port 8081)
+// Request 2 → Instance B (port 8082)
+// Request 3 → Instance C (port 8083)
+
+// Spring Cloud LoadBalancer (client-side)
+@LoadBalanced
+@Bean
+public RestTemplate restTemplate() {
+    return new RestTemplate();
+}
+
+// Automatically distributes calls across instances
+restTemplate.getForObject(
+    "http://user-service/users/1", User.class
+);
+// Eureka returns multiple instances, LoadBalancer picks one`
+      }
+    ],
+    trapQuestions: [
+      { question: "Microservices vs Monolith — which is always better?", answer: "Neither. Monolith is simpler for small teams and early-stage products. Microservices add complexity (networking, distributed transactions, deployment). Choose based on scale and team size." },
+      { question: "Can microservices share a database?", answer: "Anti-pattern. Each service should own its data. Shared DB creates tight coupling. Use APIs or events to share data between services." },
+      { question: "What happens if Eureka Server goes down?", answer: "Services use cached registry. They can still communicate using last known addresses. But new services can't register until Eureka is back." },
+      { question: "Kafka vs RabbitMQ — when to use which?", answer: "Kafka for high-throughput event streaming and log aggregation. RabbitMQ for traditional message queuing with complex routing. Kafka retains messages, RabbitMQ deletes after consumption." }
+    ]
   }
 ];
 
@@ -2409,10 +2948,14 @@ export const cheatSheetItems = [
   { term: "String Pool", def: "Literals shared, new() bypasses it", colorClass: "topic-strings" },
   { term: "StringBuilder", def: "Mutable, fast, not thread-safe", colorClass: "topic-spring" },
   { term: "@Transactional", def: "Self-invocation = proxy bypassed!", colorClass: "topic-solid" },
-  { term: "Circuit Breaker", def: "Fail fast + fallback = resilience", colorClass: "topic-interface" },
+  { term: "Circuit Breaker", def: "Fail fast + fallback = resilience", colorClass: "topic-micro" },
   { term: "AOP @Around", def: "Wraps entire method — most powerful", colorClass: "topic-patterns" },
   { term: "HashMap", def: "O(1) avg, hashCode + equals", colorClass: "topic-ds" },
   { term: "BST Inorder", def: "Left→Root→Right = sorted output", colorClass: "topic-ds" },
   { term: "ACID", def: "Atomic, Consistent, Isolated, Durable", colorClass: "topic-db" },
   { term: "LEFT JOIN", def: "All left rows + matching right", colorClass: "topic-db" },
+  { term: "Eureka", def: "Service registry for discovery", colorClass: "topic-micro" },
+  { term: "API Gateway", def: "Single entry point, routes requests", colorClass: "topic-micro" },
+  { term: "Saga Pattern", def: "Distributed tx with compensations", colorClass: "topic-micro" },
+  { term: "Kafka", def: "High-throughput event streaming", colorClass: "topic-micro" },
 ];
