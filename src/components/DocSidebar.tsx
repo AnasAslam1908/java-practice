@@ -8,8 +8,14 @@ interface DocSidebarProps {
   onSectionSelect: (topicId: string, sectionIndex: number) => void;
 }
 
-export default function DocSidebar({ activeTopic, onTopicSelect, onSectionSelect }: DocSidebarProps) {
-  const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set([activeTopic]));
+export default function DocSidebar({
+  activeTopic,
+  onTopicSelect,
+  onSectionSelect,
+}: DocSidebarProps) {
+  const [expandedTopics, setExpandedTopics] = useState<Set<string>>(
+    new Set([activeTopic]),
+  );
 
   const toggleExpand = (topicId: string) => {
     setExpandedTopics((prev) => {
@@ -28,7 +34,9 @@ export default function DocSidebar({ activeTopic, onTopicSelect, onSectionSelect
   return (
     <nav className="py-5 px-3">
       <div className="px-2 mb-4">
-        <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Documentation</h2>
+        <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Documentation
+        </h2>
       </div>
       <div className="space-y-0.5">
         {topics.map((topic: Topic) => {
@@ -39,8 +47,11 @@ export default function DocSidebar({ activeTopic, onTopicSelect, onSectionSelect
             <div key={topic.id}>
               <button
                 onClick={() => {
+                  if (isActive) {
+                    toggleExpand(topic.id);
+                    return;
+                  }
                   handleTopicClick(topic.id);
-                  toggleExpand(topic.id);
                 }}
                 className={`w-full flex items-center gap-2.5 px-2.5 py-[7px] text-[13px] rounded-md transition-colors ${
                   isActive

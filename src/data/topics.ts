@@ -34,7 +34,7 @@ export const topics: Topic[] = [
           "A class is a blueprint; an object is an instance of that blueprint",
           "Every Java file must have at least one class",
           "Objects have state (fields) and behavior (methods)",
-          "Use `new` keyword to instantiate objects"
+          "Use `new` keyword to instantiate objects",
         ],
         interview: `"A class is just a template. Like if I'm building a user management system, I don't write separate code for every user — I create a User class once and create objects from it. Each object has its own name, email, password but follows the same structure"`,
         code: `public class Account {
@@ -53,7 +53,7 @@ export const topics: Topic[] = [
 
 // Object creation — each has its own state
 Account acc1 = new Account("Rahul", 5000.0);
-Account acc2 = new Account("Priya", 12000.0);`
+Account acc2 = new Account("Priya", 12000.0);`,
       },
       {
         title: "Encapsulation",
@@ -62,7 +62,7 @@ Account acc2 = new Account("Priya", 12000.0);`
           "Make fields private, expose via getters/setters",
           "Enables validation inside setters",
           "Controls access to internal state",
-          "Foundation of secure Java design"
+          "Foundation of secure Java design",
         ],
         interview: `"It's about protecting your data. Imagine a bank — you can't just walk in and change your balance directly. You have to go through a teller (a method). Same idea — I make sensitive fields private and expose only what's needed through getters/setters"`,
         code: `public class Employee {
@@ -77,7 +77,7 @@ Account acc2 = new Account("Priya", 12000.0);`
             throw new IllegalArgumentException("Invalid salary");
         this.salary = salary; // validated before setting
     }
-}`
+}`,
       },
       {
         title: "Inheritance",
@@ -86,7 +86,7 @@ Account acc2 = new Account("Priya", 12000.0);`
           "Child class inherits from parent using `extends`",
           "Use only for true IS-A relationships",
           "Java supports single class inheritance",
-          "A class can implement multiple interfaces"
+          "A class can implement multiple interfaces",
         ],
         interview: `""Instead of copy-pasting code, I let one class borrow from another. Like if I have an Admin and a Customer — both are users, both have login/logout. So I put that in a User base class and extend it. Admin gets extra permissions on top.."`,
         code: `public class User {
@@ -107,7 +107,7 @@ public class Admin extends User {
 }
 
 Admin a = new Admin();
-a.login(); // inherited — works!`
+a.login(); // inherited — works!`,
       },
       {
         title: "Polymorphism",
@@ -116,9 +116,9 @@ a.login(); // inherited — works!`
           "Compile-time: method overloading (same name, different params)",
           "Runtime: method overriding (parent ref, child object)",
           "JVM decides which method to call based on actual object type",
-          "Enables flexible and extensible code"
+          "Enables flexible and extensible code",
         ],
-        interview: `"Two types in Java — compile-time (method overloading) and runtime (method overriding). Runtime polymorphism is powerful — same reference type, different behavior. The JVM decides which method to call based on the actual object, not the reference type."`,
+        interview: `"It means the same action can behave differently depending on the object type. It has two types in Java — compile-time (method overloading) and runtime (method overriding). Runtime polymorphism is powerful — same reference type, different behavior. The JVM decides which method to call based on the actual object, not the reference type."`,
         code: `// Runtime Polymorphism — Overriding
 class Payment {
     public void process() {
@@ -142,7 +142,7 @@ class Calculator {
     public int add(int a, int b)       { return a + b; }
     public double add(double a, double b) { return a + b; }
     public String add(String a, String b) { return a + b; }
-}`
+}`,
       },
       {
         title: "Abstraction",
@@ -151,7 +151,7 @@ class Calculator {
           "Abstract class: partial implementation, can have fields",
           "Interface: pure contract, traditionally no state",
           "Java 8 added default methods to interfaces",
-          "Use abstract class for shared code, interface for shared behavior"
+          "Use abstract class for shared code, interface for shared behavior",
         ],
         interview: `"It's about hiding complexity. When I built an API layer, the caller didn't need to know whether data was coming from a database or cache. I abstracted that behind a DataService interface. The caller just says getData() and doesn't care about the rest MoreOver
         Two ways in Java — abstract classes and interfaces. Abstract class for partial implementation, interface for pure contract. Key difference: abstract class HAS state (fields), interface traditionally doesn't. Java 8 added default methods to interfaces."`,
@@ -176,7 +176,151 @@ interface Electric {
 class Tesla extends Vehicle implements Electric {
     public void fuelType()      { System.out.println("Electric"); }
     public void chargeBattery() { System.out.println("Charging..."); }
-}`
+}`,
+      },
+      {
+        title: "Association",
+        tag: "General HAS-A Relationship",
+        keyPoints: [
+          "Objects are related but independent",
+          "Created OUTSIDE the parent and passed in (or referenced)",
+          "Parent holds a reference to the associated object",
+          "Example: Company HAS Employees — employees can change jobs",
+        ],
+        interview: `"Association is just saying two objects are related. A Company HAS Employees. But it's loose coupling — the Employee can work for multiple companies (in real world) or change jobs. In code, I create the Employee outside and pass it to Company, or the Company just holds a reference. If Company closes, Employees still exist and can join another company."`,
+        code: `// Employee exists independently
+public class Employee {
+    private String name;
+    private String role;
+
+    public Employee(String name, String role) {
+        this.name = name;
+        this.role = role;
+    }
+
+    public String getName() { return name; }
+}
+
+// Company has association with Employee
+public class Company {
+    private String name;
+    private List<Employee> employees;
+
+    public Company(String name) {
+        this.name = name;
+        this.employees = new ArrayList<>();
+    }
+
+    public void hireEmployee(Employee emp) {
+        this.employees.add(emp);  // reference is added (not created)
+    }
+
+    public void removeEmployee(Employee emp) {
+        this.employees.remove(emp);
+    }
+}
+
+// Usage: Employee exists independently, associated with Company
+Employee e1 = new Employee("Rahul", "Developer");
+Employee e2 = new Employee("Priya", "Designer");
+
+Company google = new Company("Google");
+google.hireEmployee(e1);
+google.hireEmployee(e2);
+
+Company amazon = new Company("Amazon");
+amazon.hireEmployee(e1);  // same employee, associated with multiple companies
+
+// e1 exists independently of both companies ✅`,
+      },
+      {
+        title: "Association vs Inheritance",
+        tag: "Design Decision",
+        keyPoints: [
+          "Inheritance (IS-A): Extend behavior, share code, true hierarchical relationship",
+          "Association (HAS-A): Add related objects without modifying class structure",
+          "Use Inheritance when: 'X IS-A Y' makes sense and you want to reuse code",
+          "Use Association when: 'X HAS-A Y' and they're independent entities",
+          "Inheritance forces tight coupling; Association allows loose coupling",
+          "Inheritance creates tight coupling because child depends heavily on parent, while association provides loose coupling as objects interact without strong dependency.",
+          "Favor composition/association over inheritance (design principle)",
+        ],
+        interview: `"Two different relationships. Inheritance is IS-A — Dog IS-A Animal. We extend the parent class, inherit its behavior, and override what we need. Use it for hierarchies. Association is HAS-A — Company HAS Employee. We're relating two objects without inheritance. Association is looser coupling — the objects are independent. A rule of thumb: prefer Association over Inheritance unless true IS-A relationship exists. Association is more flexible."`,
+        code: `// ❌ BAD: Using Inheritance when Association is appropriate
+class Person {
+    String name;
+    void eat() { System.out.println("Eating"); }
+}
+
+class Company extends Person {  // WRONG! Company IS NOT-A Person
+    String companyName;
+}
+
+// ✅ GOOD: Using Association instead
+class Company {
+    String companyName;
+    List<Employee> employees;
+
+    public void hireEmployee(Employee emp) {
+        employees.add(emp);
+    }
+}
+
+class Employee {
+    String name;
+    void work() { System.out.println("Working"); }
+}
+
+// ----------
+
+// ✅ CORRECT: Using Inheritance for true IS-A
+class Animal {
+    public void breathe() { System.out.println("Breathing"); }
+}
+
+class Dog extends Animal {  // Dog IS-A Animal ✅
+    public void bark() { System.out.println("Woof!"); }
+}
+
+// ----------
+
+// Real-world comparison:
+
+// IS-A (Inheritance) - Animal → Dog, Cat
+class Animal {
+    public void sound() { System.out.println("Generic sound"); }
+}
+
+class Dog extends Animal {
+    @Override
+    public void sound() { System.out.println("Bark"); }
+}
+
+// HAS-A (Association) - Car → Engine, Wheel
+class Engine {
+    public void start() { System.out.println("Engine started"); }
+}
+
+class Car {
+    private Engine engine;  // Association - Car HAS-A Engine
+
+    public Car(Engine engine) {
+        this.engine = engine;  // passed in from outside
+    }
+
+    public void start() {
+        engine.start();
+    }
+}
+
+// Usage
+Engine turboDiesel = new Engine();
+Car mycar = new Car(turboDiesel);
+mycar.start();
+
+// Key difference:
+// Inheritance: Dog IS-A Animal (deep hierarchy, tightly coupled)
+// Association: Car HAS-A Engine (flexible, loose coupling)`,
       },
       {
         title: "Composition — Strong HAS-A",
@@ -185,7 +329,7 @@ class Tesla extends Vehicle implements Electric {
           "Child CANNOT exist without the parent",
           "Composed object is created INSIDE the parent",
           "Prefer over inheritance when no true IS-A relationship",
-          "Example: House has Rooms — destroy House, Rooms gone"
+          "Example: House has Rooms — destroy House, Rooms gone",
         ],
         interview: `"Composition is a strong HAS-A where the child CANNOT exist without the parent. A House HAS Rooms — destroy the House, Rooms are gone too. In code, the composed object is created INSIDE the parent. Prefer this over inheritance when there's no true IS-A relationship."`,
         code: `// Room cannot exist without House — created internally
@@ -218,7 +362,7 @@ public class Stack<T> {
     public T pop()            { return storage.pop(); }
     public T peek()           { return storage.peek(); }
     // No accidental Deque methods exposed to callers!
-}`
+}`,
       },
       {
         title: "Aggregation — Weak HAS-A",
@@ -227,7 +371,7 @@ public class Stack<T> {
           "Child CAN exist independently of parent",
           "Object is PASSED IN via constructor or setter",
           "Example: Department has Professors — department closes, professors remain",
-          "Weaker coupling than composition"
+          "Weaker coupling than composition",
         ],
         interview: `"Aggregation is a WEAK HAS-A — the child CAN exist independently. A Department HAS Professors, but if the Department is closed, the Professors still exist. In code, the object is PASSED IN via constructor or setter — not created inside."`,
         code: `// Professor exists independently of Department
@@ -258,7 +402,7 @@ Professor p2 = new Professor("Dr. Gupta", "Physics");
 List<Professor> staff = Arrays.asList(p1, p2);
 Department dept = new Department("Science", staff);
 
-// dept = null? p1 and p2 still alive ✅`
+// dept = null? p1 and p2 still alive ✅`,
       },
       {
         title: "Composition vs Aggregation vs Inheritance",
@@ -267,7 +411,7 @@ Department dept = new Department("Science", staff);
           "IS-A = Inheritance (Dog IS-A Animal)",
           "Strong HAS-A = Composition (Heart in Body)",
           "Weak HAS-A = Aggregation (Student in University)",
-          "Ask: 'Can the child exist without the parent?'"
+          "Ask: 'Can the child exist without the parent?'",
         ],
         interview: `"Three relationship types. IS-A = Inheritance (Dog IS-A Animal). Strong HAS-A = Composition (Heart in a Body — Heart dies with Body). Weak HAS-A = Aggregation (Student in University — Student survives). Ask: 'Can the child exist without the parent?' YES → Aggregation, NO → Composition."`,
         code: `// IS-A — Inheritance
@@ -305,9 +449,332 @@ class University {
 // "Can the child exist without the parent?"
 //   YES  →  Aggregation (weak HAS-A)
 //   NO   →  Composition (strong HAS-A)
-//   IS-A →  Inheritance`
+//   IS-A →  Inheritance`,
+      },
+      {
+        title: "Static Keyword in Java",
+        tag: "Class-Level Members",
+        keyPoints: [
+          "Static belongs to class, not object",
+          "Static members can be accessed without creating an object",
+          "Static variable: one shared copy for all objects",
+          "Static method: can directly access only static members",
+          "Static block runs once when class is loaded",
+          "Static nested class can be used without Outer object",
+          "main() is static because JVM calls it without creating object",
+          "Static memory is stored in Method Area (Class Area)",
+        ],
+        interview: `"The static keyword is for class-level members. That means it belongs to the class, not to each object. Static variables are shared by all objects, static methods can be called using ClassName.method(), and static blocks run when class loads. main() is static because JVM needs to call it without creating an object. In short: static means shared class-level behavior/data, accessible without object creation."`,
+        code: `// 1) Static Variable (Class Variable)
+    class Student {
+      static String school = "ABC School"; // one shared copy
+      String name;
+    }
+
+    Student s1 = new Student();
+    Student s2 = new Student();
+    System.out.println(Student.school); // same for all students
+
+    // ----------
+
+    // 2) Static Method
+    class MathUtils {
+      static int square(int x) {
+        return x * x;
       }
-    ]
+    }
+
+    int result = MathUtils.square(5); // no object needed
+
+    // ----------
+
+    // 3) Static Block
+    class Test {
+      static {
+        System.out.println("Class Loaded");
+      }
+    }
+    // runs when JVM loads Test class
+
+    // ----------
+
+    // 4) Static Nested Class
+    class Outer {
+      static class Inner {
+        void show() {
+          System.out.println("Inside inner");
+        }
+      }
+    }
+
+    Outer.Inner obj = new Outer.Inner(); // no Outer object needed
+
+    // ----------
+
+    // Why main() is static
+    public class Main {
+      public static void main(String[] args) {
+        System.out.println("JVM calls main without creating object");
+      }
+    }
+
+    // Interview one-liner:
+    // "static is used for class-level members that are shared by all objects
+    // and can be accessed without creating an object."
+
+    // Real-life analogy:
+    // Class = Template, Object = actual student
+    // static = school name (same for everyone)
+    // non-static = student name (different per object)`,
+      },
+      {
+        title: "Static Binding vs Dynamic Binding",
+        tag: "Method Resolution",
+        keyPoints: [
+          "Static binding = method resolved at compile-time based on reference type",
+          "Dynamic binding = method resolved at runtime based on actual object type",
+          "Static binding applies to static, private, final methods",
+          "When a child defines same static method, it is Method Hiding (not overriding)",
+          "Dynamic binding is how method overriding (polymorphism) works",
+          "Overloading is always static binding; overriding is dynamic binding",
+        ],
+        interview: `"Binding means how the compiler/JVM decides which method to call. Static binding happens at compile-time — based on reference type. Dynamic binding happens at runtime — based on actual object type. Method overloading is static binding, method overriding is dynamic binding. For static methods, if child defines same method, it's called Method Hiding. Example: Animal ref = new Dog(); ref.staticMethod() calls Animal version because static methods belong to class and use reference type."`,
+        code: `// Static Binding Example (Method Hiding)
+    class Animal {
+      static void staticMethod() {
+        System.out.println("Animal static");
+      }
+    }
+
+    class Dog extends Animal {
+      static void staticMethod() {
+        System.out.println("Dog static");  // Method Hiding (not overriding)
+      }
+    }
+
+    // Static binding — decided at compile-time using REFERENCE type
+    Animal ref = new Dog();
+    ref.staticMethod();       // prints "Animal static"
+
+    // Why? static methods belong to class, not object
+    // So this is called METHOD HIDING
+
+    // ----------
+
+    // Dynamic Binding Example
+    class Vehicle {
+      public void start() {      // Can be overridden
+        System.out.println("Vehicle started");
+      }
+    }
+
+    class Car extends Vehicle {
+      @Override
+      public void start() {
+        System.out.println("Car engine started");
+      }
+    }
+
+    class Bike extends Vehicle {
+      @Override
+      public void start() {
+        System.out.println("Bike engine started");
+      }
+    }
+
+    // Dynamic binding — decided at runtime
+    Vehicle v1 = new Car();
+    v1.start();          // prints "Car engine started" (actual object type)
+
+    Vehicle v2 = new Bike();
+    v2.start();          // prints "Bike engine started" (actual object type)
+
+    // ----------
+
+    // Static Binding with final
+    class Parent {
+      public final void cannotOverride() {  // final methods = static binding
+        System.out.println("Parent");
+      }
+    }
+
+    class Child extends Parent {
+      // Cannot override because method is final
+      // public void cannotOverride() { }  // COMPILE ERROR
+    }
+
+    Parent p = new Child();
+    p.cannotOverride();     // Always calls Parent version (static binding)
+
+    // ----------
+
+    // Combined Example: Static, Dynamic, Private, Final in one place
+    class Animal {
+
+      // Static method → static binding (compile-time)
+      static void staticMethod() {
+        System.out.println("Animal static method");
+      }
+
+      // Instance method → dynamic binding (runtime)
+      void instanceMethod() {
+        System.out.println("Animal instance method");
+      }
+
+      // Private method → not visible to child → static binding
+      private void privateMethod() {
+        System.out.println("Animal private method");
+      }
+
+      // Final method → cannot be overridden → static binding
+      final void finalMethod() {
+        System.out.println("Animal final method");
+      }
+
+      // Public method to access private
+      void callPrivate() {
+        privateMethod();
+      }
+    }
+
+    class Dog extends Animal {
+
+      // Hiding static method → static binding
+      static void staticMethod() {
+        System.out.println("Dog static method");
+      }
+
+      // Overriding instance method → dynamic binding
+      @Override
+      void instanceMethod() {
+        System.out.println("Dog instance method");
+      }
+
+      // Private method → completely separate
+      private void privateMethod() {
+        System.out.println("Dog private method");
+      }
+
+      // Cannot override finalMethod → compile error if tried
+      // void finalMethod() {}  // ❌
+    }
+
+    public class Main {
+      public static void main(String[] args) {
+
+        Animal ref2 = new Dog();
+
+        // ✅ Static binding (reference type decides)
+        ref2.staticMethod();        // Animal static method
+
+        // ✅ Dynamic binding (object type decides)
+        ref2.instanceMethod();      // Dog instance method
+
+        // ✅ Private method → cannot access via reference
+        // ref2.privateMethod();    // ❌ COMPILE ERROR
+
+        // ✅ Access private via public method
+        ref2.callPrivate();         // Animal private method
+
+        // ✅ Final method → static binding
+        ref2.finalMethod();         // Animal final method
+
+        System.out.println("\\nDirect class access:");
+
+        // Static methods can be called directly
+        Animal.staticMethod();      // Animal static method
+        Dog.staticMethod();         // Dog static method
+      }
+    }`,
+      },
+      {
+        title: "Association vs Aggregation vs Composition",
+        tag: "Detailed Side-by-Side",
+        keyPoints: [
+          "Association: Just 'uses-a' relationship, loose coupling, no ownership",
+          "Aggregation: 'Weak HAS-A', object passed in from outside, can exist independently",
+          "Composition: 'Strong HAS-A', object created inside, child depends on parent",
+          "Decision: Can the child exist without the parent? YES→Aggregation, NO→Composition",
+          "Association has lowest coupling, Composition has highest",
+        ],
+        interview: `"Three types of relationships. Association is just 'uses-a' — Teacher USES Student (no ownership, method-level). Aggregation is 'weak HAS-A' — University HAS Department, but Department can exist without University (passed in from outside). Composition is 'strong HAS-A' — Car HAS Engine, Engine cannot exist without Car (created inside). The key question: Can the child exist without the parent? YES→Aggregation, NO→Composition, Neither→Association."`,
+        code: `// 1️⃣ Association (Loose Coupling) — Just "uses-a"
+class Student {
+    String name;
+}
+
+class Teacher {
+    void teach(Student s) {   // just using Student, no ownership
+        System.out.println("Teaching " + s.name);
+    }
+}
+
+// Key: No ownership, objects independent, just method-level usage
+
+// ----------
+
+// 2️⃣ Aggregation (Weak HAS-A) — Object stored but can exist independently
+class Department {
+    String name;
+
+    Department(String name) {
+        this.name = name;
+    }
+}
+
+class University {
+    Department dept;   // aggregation — passed in
+
+    University(Department dept) {
+        this.dept = dept;  // created OUTSIDE → passed inside
+    }
+}
+
+// Usage:
+Department d1 = new Department("CS");
+University u1 = new University(d1);
+// d1 = null? Department still exists ✅
+
+// Key: Created outside, passed inside, can exist independently
+
+// ----------
+
+// 3️⃣ Composition (Strong HAS-A) — Object cannot exist without container
+class Engine {
+    void start() { System.out.println("Engine started"); }
+}
+
+class Car {
+    private Engine engine = new Engine();  // created INSIDE — composition
+
+    public void startCar() {
+        engine.start();
+    }
+}
+
+// Usage:
+Car c1 = new Car();  // Engine auto-created
+// Car destroyed → Engine destroyed ❌
+
+// Key: Created inside, no external access, lifecycle dependent
+
+// ----------
+
+// COMPARISON TABLE:
+// Feature          | Association | Aggregation | Composition
+// Relation         | Uses        | Weak HAS-A  | Strong HAS-A
+// Object Creation  | Outside     | Outside     | Inside
+// Ownership        | No          | No          | Yes
+// Dependency       | Low ✔       | Medium 🤏   | High ❌
+// Lifecycle        | Independent | Independent | Dependent
+// Can exist alone  | YES         | YES         | NO
+
+// Example:
+// Association: Teacher uses Student
+// Aggregation: University has Department (but dept exists independently)
+// Composition: Car has Engine (engine cannot exist without car)`,
+      },
+    ],
   },
   {
     id: "interface",
@@ -319,10 +786,11 @@ class University {
         title: "Interface vs Abstract Class",
         tag: "Most Asked",
         keyPoints: [
+          "Interface defines WHAT a class must do, not HOW. It's a contract. Tomorrow if I add PayPal, I just implement the same interface — my checkout code doesn't change at all. That's the power.",
           "Interface = pure contract, no state",
           "Abstract class = partial implementation with fields",
           "Java 8+ interfaces can have default and static methods",
-          "A class can implement multiple interfaces but extend only one class"
+          "A class can implement multiple interfaces but extend only one class",
         ],
         interview: `"Interface = pure contract, no state. Abstract class = partial implementation, can have fields. Use interface when unrelated classes share behavior (Flyable, Serializable). Use abstract class when related classes share code. From Java 8, interfaces can have default and static methods."`,
         code: `interface Flyable {
@@ -351,7 +819,7 @@ abstract class Bird {
 class Eagle extends Bird implements Flyable {
     public void speak() { System.out.println("Screech!"); }
     public void fly()   { System.out.println("Soaring!"); }
-}`
+}`,
       },
       {
         title: "Functional Interface & Lambdas",
@@ -360,7 +828,7 @@ class Eagle extends Bird implements Flyable {
           "Interface with exactly ONE abstract method",
           "@FunctionalInterface annotation for compile-time safety",
           "Lambdas provide concise syntax for functional interfaces",
-          "Built-in: Predicate, Function, Consumer, Supplier"
+          "Built-in: Predicate, Function, Consumer, Supplier",
         ],
         interview: `"Interface with exactly ONE abstract method. Java 8 introduced @FunctionalInterface and lambdas. Runnable, Comparator, Predicate, Function are all functional interfaces — the backbone of Java Streams."`,
         code: `@FunctionalInterface
@@ -385,9 +853,9 @@ names.stream()
      .filter(n -> n.length() > 3)    // Predicate<String>
      .map(String::toUpperCase)        // Function<String,String>
      .sorted()
-     .forEach(System.out::println);`
-      }
-    ]
+     .forEach(System.out::println);`,
+      },
+    ],
   },
   {
     id: "solid",
@@ -402,7 +870,7 @@ names.stream()
           "One class, one reason to change",
           "Split responsibilities into separate classes",
           "Easier to test and maintain",
-          "Each class should do one thing well"
+          "Each class should do one thing well",
         ],
         interview: `"One class, one reason to change. If my UserService handles DB operations AND sends emails — it has two reasons to change. Split them. Easier to test too — I can test EmailService without touching UserService."`,
         code: `// BAD — too many responsibilities
@@ -429,7 +897,7 @@ class UserService {
         repo.save(u);
         emailSvc.sendWelcome(u);
     }
-}`
+}`,
       },
       {
         title: "O — Open/Closed",
@@ -438,7 +906,7 @@ class UserService {
           "Open for extension, closed for modification",
           "Add new features via new classes, not editing existing ones",
           "Use interfaces and polymorphism",
-          "Protects tested, working code"
+          "Protects tested, working code",
         ],
         interview: `"Open for extension, closed for modification. Adding new features should mean adding new classes, not editing tested code. Use interfaces so new behavior is added by creating new classes only."`,
         code: `// BAD — adding new discount = editing this method
@@ -467,7 +935,7 @@ class DiscountService {
     public double apply(DiscountStrategy s, double price) {
         return s.apply(price);
     }
-}`
+}`,
       },
       {
         title: "L — Liskov Substitution",
@@ -476,7 +944,7 @@ class DiscountService {
           "Substituting a child for a parent should never break behavior",
           "Classic violation: Square extending Rectangle",
           "Fix with common abstractions (interfaces)",
-          "Ensures reliable polymorphism"
+          "Ensures reliable polymorphism",
         ],
         interview: `"If I substitute a child object where a parent is expected, nothing should break. Classic violation: Square extending Rectangle — setting width on a Square also changes height, breaking Rectangle's contract."`,
         code: `// VIOLATION — Square breaks Rectangle's contract
@@ -503,7 +971,7 @@ System.out.println(r.area()); // expects 15, gets 9
 // FIX — common abstraction, no inheritance between them
 interface Shape  { int area(); }
 class Rectangle implements Shape { /* ... */ }
-class Square    implements Shape { /* ... */ }`
+class Square    implements Shape { /* ... */ }`,
       },
       {
         title: "I — Interface Segregation",
@@ -512,7 +980,7 @@ class Square    implements Shape { /* ... */ }`
           "Don't force classes to implement unneeded methods",
           "Break fat interfaces into focused ones",
           "Java supports multiple interface implementation",
-          "Small interfaces = flexible design"
+          "Small interfaces = flexible design",
         ],
         interview: `"Don't force classes to implement methods they don't need. Break fat interfaces into focused ones. Since Java classes can implement multiple interfaces, there's no excuse for a fat one."`,
         code: `// BAD — OldPrinter forced to implement scan/fax
@@ -541,7 +1009,7 @@ class AllInOne implements Printable, Scannable, Faxable {
     public void print(String d) { /* ... */ }
     public void scan(String d)  { /* ... */ }
     public void fax(String d)   { /* ... */ }
-}`
+}`,
       },
       {
         title: "D — Dependency Inversion",
@@ -550,7 +1018,7 @@ class AllInOne implements Printable, Scannable, Faxable {
           "High-level modules depend on abstractions, not concrete classes",
           "Inject dependencies via constructors",
           "Enables easy testing with mocks",
-          "This is what Spring's @Autowired does"
+          "This is what Spring's @Autowired does",
         ],
         interview: `"High-level modules shouldn't depend on low-level modules — both depend on abstractions. Don't 'new up' dependencies inside a class, inject them. This is exactly what Spring's @Autowired does, and it makes code testable."`,
         code: `// BAD — tightly coupled, can't swap DB or test
@@ -584,14 +1052,215 @@ class OrderService {
 }
 
 // Spring: @Autowired injects automatically
-// Tests: new OrderService(new MockRepo())`
-      }
+// Tests: new OrderService(new MockRepo())`,
+      },
     ],
     trapQuestions: [
-      { question: "Which SOLID principle does Spring's @Autowired implement?", answer: "Dependency Inversion. It injects abstractions — your class depends on an interface, Spring decides the implementation at runtime." },
-      { question: "Can you violate SOLID and write good code?", answer: "Yes — for small scripts or prototypes, SOLID adds overhead. It shines in large codebases where requirements evolve. Apply judgment, not dogma." },
-      { question: "Which is hardest to follow?", answer: "Open/Closed — predicting all future extension points is hard. Refactor toward OCP when you notice editing the same class repeatedly." }
-    ]
+      {
+        question: "Which SOLID principle does Spring's @Autowired implement?",
+        answer:
+          "Dependency Inversion. It injects abstractions — your class depends on an interface, Spring decides the implementation at runtime.",
+      },
+      {
+        question: "Can you violate SOLID and write good code?",
+        answer:
+          "Yes — for small scripts or prototypes, SOLID adds overhead. It shines in large codebases where requirements evolve. Apply judgment, not dogma.",
+      },
+      {
+        question: "Which is hardest to follow?",
+        answer:
+          "Open/Closed — predicting all future extension points is hard. Refactor toward OCP when you notice editing the same class repeatedly.",
+      },
+    ],
+  },
+  {
+    id: "must-know",
+    label: "Must-Know Topics",
+    icon: "🔥",
+    colorClass: "topic-oop",
+    sections: [
+      {
+        title: "Array vs Linked List",
+        tag: "Interview Style",
+        keyPoints: [
+          "Array uses contiguous memory and fixed size",
+          "Linked List uses non-contiguous nodes with pointers and dynamic size",
+          "Array gives O(1) indexed access, Linked List access is O(n)",
+          "Insertion/deletion in middle is costly in arrays, pointer-based in Linked List",
+          "Array is better for fast indexing; Linked List for frequent structural changes",
+        ],
+        interview: `"Both store multiple values, but storage strategy is different. Array is contiguous and fixed-size, so random access is fast O(1). Linked List stores nodes connected by references, so access is O(n), but insert/delete (when position/node is known) is efficient because you change pointers instead of shifting elements."`,
+        code: `// Array example
+int[] arr = new int[5];
+arr[0] = 10;
+arr[1] = 20;
+
+// Memory (conceptual): [10][20][30][40][50]
+// contiguous locations
+
+// ----------
+
+// Linked List node structure
+class Node {
+    int data;
+    Node next;
+}
+
+// Memory (conceptual): [10 | *] -> [20 | *] -> [30 | null]
+// non-contiguous nodes
+
+// ----------
+
+// Quick differences
+// Feature       | Array          | Linked List
+// Memory        | Contiguous     | Non-contiguous
+// Size          | Fixed          | Dynamic
+// Access        | O(1)           | O(n)
+// Insert/Delete | O(n) middle    | O(1) if position/node known
+// Extra Memory  | Low            | Extra pointer memory
+
+// When to use:
+// Array      -> fixed size, fast indexing
+// LinkedList -> dynamic size, frequent insert/delete`,
+      },
+      {
+        title: "For Loop vs Recursion",
+        tag: "Interview Style",
+        keyPoints: [
+          "Both perform repeated work, but mechanism is different",
+          "For loop is iterative and uses a single stack frame",
+          "Recursion calls itself and creates a new stack frame per call",
+          "Recursion must have a base case to avoid StackOverflowError",
+          "Loops are typically faster and memory-efficient; recursion can be cleaner for trees/divide-and-conquer",
+        ],
+        interview: `"For loop is iterative and memory-efficient because execution stays in one method frame. Recursion solves a problem by self-calls and needs a base case. It is elegant for trees, backtracking, and divide-and-conquer, but can consume more memory and risk stack overflow if depth is high or base case is missing."`,
+        code: `// For loop: print 1 to 5
+for (int i = 1; i <= 5; i++) {
+    System.out.println(i);
+}
+
+// ----------
+
+// Recursion: print 1 to 5
+void print(int n) {
+    if (n > 5) return; // base case
+
+    System.out.println(n);
+    print(n + 1);      // recursive call
+}
+
+print(1);
+
+// ----------
+
+// Example where recursion is natural
+int factorial(int n) {
+    if (n == 1) return 1;
+    return n * factorial(n - 1);
+}
+
+// Comparison
+// Feature     | For Loop         | Recursion
+// Speed       | Usually faster   | Slightly slower
+// Memory      | Low              | High (call stack)
+// Risk        | No stack overflow| StackOverflowError possible
+// Best Use    | Simple repetition| Trees, backtracking, divide&conquer`,
+      },
+      {
+        title: "Linked List Types: Pros & Cons",
+        tag: "Singly vs Doubly vs Circular",
+        keyPoints: [
+          "Singly Linked List: simple and memory-light but no reverse traversal",
+          "Doubly Linked List: bi-directional traversal and easier deletion, but extra memory",
+          "Circular Linked List: useful for round-robin, but loop conditions must be handled carefully",
+          "Choose type based on traversal direction, memory budget, and operation pattern",
+        ],
+        interview: `"Singly is easiest and memory efficient, but reverse traversal is not possible. Doubly supports forward and backward traversal and easier node removal at the cost of extra pointer memory. Circular connects last node back to first, useful in round-robin scheduling, but wrong traversal condition can cause infinite loops."`,
+        code: `// 1) Singly Linked List node
+class SNode {
+    int data;
+    SNode next;
+}
+// [10 | *] -> [20 | *] -> [30 | null]
+
+// 2) Doubly Linked List node
+class DNode {
+    int data;
+    DNode prev;
+    DNode next;
+}
+// null <- [10] <-> [20] <-> [30] -> null
+
+// 3) Circular Linked List node (last.next = head)
+class CNode {
+    int data;
+    CNode next;
+}
+// [10] -> [20] -> [30]
+//   ^               |
+//   |---------------|
+
+// Quick comparison
+// Feature            | Singly   | Doubly   | Circular
+// Memory             | Low      | High     | Medium
+// Reverse Traversal  | No       | Yes      | Possible (design-dependent)
+// Implementation     | Easy     | Moderate | Moderate
+// Risk               | Low      | Medium   | Infinite-loop risk
+
+// Use cases
+// Singly   -> simple stack/list
+// Doubly   -> browser back/forward
+// Circular -> CPU round-robin scheduling`,
+      },
+      {
+        title: "Access Modifiers in Java",
+        tag: "private/default/protected/public",
+        keyPoints: [
+          "private: accessible only within same class",
+          "default (package-private): accessible within same package",
+          "protected: same package + subclass access in other package",
+          "public: accessible from anywhere",
+          "Top-level classes can be only public or default",
+          "private fields support encapsulation with getters/setters",
+        ],
+        interview: `"Access modifiers define visibility. private is most restrictive, public is most open. default allows package-only access, and protected additionally allows inheritance-based access across packages. For top-level classes, only public and default are allowed. We usually keep fields private and expose controlled access via methods for encapsulation."`,
+        code: `// 1) private
+class Student {
+    private int marks = 90; // only inside Student
+}
+
+// 2) default (no modifier)
+class Person {
+    int age = 20; // package-private
+}
+
+// 3) protected
+class Employee {
+    protected String name;
+}
+
+// 4) public
+public class Main {
+    public int id;
+}
+
+// Access summary
+// Modifier   | Same Class | Same Package | Subclass(Other Pkg) | Other Pkg
+// private    | Yes        | No           | No                  | No
+// default    | Yes        | Yes          | No                  | No
+// protected  | Yes        | Yes          | Yes                 | No
+// public     | Yes        | Yes          | Yes                 | Yes
+
+// Encapsulation pattern
+class SalaryBox {
+    private int salary;
+
+    public int getSalary() {
+        return salary;
+    }
+}`,
+      },
+    ],
   },
   {
     id: "patterns",
@@ -606,7 +1275,7 @@ class OrderService {
           "One instance for the entire application",
           "Use cases: DB pool, Logger, Config",
           "Bill Pugh (static inner class) is preferred in Java",
-          "Thread-safe without synchronization overhead"
+          "Thread-safe without synchronization overhead",
         ],
         interview: `"One instance for the entire app — DB connection pool, Logger, Config. Bill Pugh (static inner class) is the best Java approach — lazily loaded and thread-safe without synchronization overhead."`,
         code: `// Bill Pugh Singleton — preferred
@@ -644,7 +1313,7 @@ public class DBPool {
     }
 }
 
-Logger.getInstance().log("App started");`
+Logger.getInstance().log("App started");`,
       },
       {
         title: "Factory Pattern",
@@ -653,7 +1322,7 @@ Logger.getInstance().log("App started");`
           "Delegate object creation to a factory method",
           "Caller specifies what, not how to build",
           "Follows Open/Closed principle",
-          "Spring's ApplicationContext is a factory"
+          "Spring's ApplicationContext is a factory",
         ],
         interview: `"Delegate object creation to a factory. Caller says what it wants, not how to build it. Follows Open/Closed — add new types by adding new classes. Spring's ApplicationContext IS a factory."`,
         code: `interface Notification {
@@ -679,7 +1348,7 @@ class NotificationFactory {
 }
 
 Notification n = NotificationFactory.create("SMS");
-n.send("Your OTP is 4521");`
+n.send("Your OTP is 4521");`,
       },
       {
         title: "Observer Pattern",
@@ -688,7 +1357,7 @@ n.send("Your OTP is 4521");`
           "When one object changes, all dependents are notified",
           "Decouples publisher from subscribers",
           "Spring's ApplicationEvent uses this pattern",
-          "Perfect for order processing pipelines"
+          "Perfect for order processing pipelines",
         ],
         interview: `"When one object changes, all dependents are notified. Spring's ApplicationEvent is built on this. Perfect for order processing — place an order, trigger email + inventory + analytics without coupling the services."`,
         code: `interface OrderObserver {
@@ -721,7 +1390,7 @@ class OrderService {
 OrderService svc = new OrderService();
 svc.subscribe(new EmailService());
 svc.subscribe(new InventoryService());
-svc.placeOrder("ORD-001"); // both notified!`
+svc.placeOrder("ORD-001"); // both notified!`,
       },
       {
         title: "Builder Pattern",
@@ -730,7 +1399,7 @@ svc.placeOrder("ORD-001"); // both notified!`
           "Fluent API for constructing objects with many optional fields",
           "Avoids telescoping constructors",
           "Lombok's @Builder generates this automatically",
-          "Java's StringBuilder is a classic example"
+          "Java's StringBuilder is a classic example",
         ],
         interview: `"When a class has many optional fields, constructors get ugly. Builder gives a fluent API. Java's StringBuilder is the classic example. Mention Lombok's @Builder which generates this boilerplate automatically."`,
         code: `public class User {
@@ -762,9 +1431,9 @@ svc.placeOrder("ORD-001"); // both notified!`
 User user = new User.Builder("John", "john@gmail.com")
     .phone("9876543210")
     .age(28)
-    .build();`
-      }
-    ]
+    .build();`,
+      },
+    ],
   },
   {
     id: "strings",
@@ -779,7 +1448,7 @@ User user = new User.Builder("John", "john@gmail.com")
           "String is immutable — every modification creates a new object",
           "String Pool in heap shares same literal objects",
           "Thread-safe and safe as HashMap key",
-          "Use `equals()` for content comparison, not `==`"
+          "Use `equals()` for content comparison, not `==`",
         ],
         interview: `"String is immutable in Java — once created, you can't change it. Every modification creates a new object. Java has a String Pool (intern pool) in heap — same literals share one object. This is why String is thread-safe and safe as a HashMap key."`,
         code: `// String Pool — literals are shared
@@ -803,7 +1472,7 @@ System.out.println(str);            // "Java Interview"
 // Why immutable?
 // 1. Thread-safe by default
 // 2. Safe HashMap key (hashcode never changes)
-// 3. Security — passwords, file paths can't be tampered`
+// 3. Security — passwords, file paths can't be tampered`,
       },
       {
         title: "String vs StringBuilder vs StringBuffer",
@@ -812,7 +1481,7 @@ System.out.println(str);            // "Java Interview"
           "String: immutable, slow for concatenation in loops",
           "StringBuilder: mutable, fast, NOT thread-safe",
           "StringBuffer: mutable, thread-safe (synchronized), slower",
-          "Use StringBuilder in 99% of cases"
+          "Use StringBuilder in 99% of cases",
         ],
         interview: `"String is immutable — every concat in a loop creates a new object, very slow. StringBuilder is mutable and fast but NOT thread-safe. StringBuffer is mutable and thread-safe (synchronized) but slower. Use StringBuilder in 99% of cases."`,
         code: `// String in loop — BAD (creates 1000 objects!)
@@ -840,7 +1509,7 @@ sb2.charAt(0);               // 'B'
 
 // StringBuffer — same API, but synchronized for threads
 StringBuffer sbf = new StringBuffer("thread");
-sbf.append("-safe");         // synchronized method`
+sbf.append("-safe");         // synchronized method`,
       },
       {
         title: "Key String Methods",
@@ -849,7 +1518,7 @@ sbf.append("-safe");         // synchronized method`
           "Most important: charAt, substring, indexOf, split, trim",
           "Search: contains, startsWith, endsWith",
           "Transform: replace, replaceAll, toUpperCase",
-          "Convert: toCharArray, valueOf, parseInt"
+          "Convert: toCharArray, valueOf, parseInt",
         ],
         interview: `"These come up in coding rounds constantly. Most important: charAt, substring, indexOf, split, trim/strip, replace, startsWith, endsWith, toCharArray, compareTo, contains."`,
         code: `String s = "  Hello World  ";
@@ -888,7 +1557,7 @@ s.replaceAll("\\\\s+", "-")     // "--Hello-World--"
 "abc".toCharArray()           // ['a','b','c']
 String.valueOf(123)           // "123"
 Integer.parseInt("123")       // 123
-String.join("-","a","b","c")  // "a-b-c"`
+String.join("-","a","b","c")  // "a-b-c"`,
       },
       {
         title: "Coding: Reverse & Palindrome",
@@ -897,7 +1566,7 @@ String.join("-","a","b","c")  // "a-b-c"`
           "StringBuilder.reverse() — simplest for production",
           "Two-pointer char array — O(1) space, interview favorite",
           "Palindrome: clean input first, then two-pointer check",
-          "Always ask: handle null? Ignore case/spaces?"
+          "Always ask: handle null? Ignore case/spaces?",
         ],
         interview: `"Multiple approaches — StringBuilder.reverse() is simplest for production. Two-pointer char array is O(1) space, preferred in interviews. For palindrome, always clarify: ignore case? Spaces? Special characters?"`,
         code: `// Reverse: StringBuilder — simplest
@@ -930,7 +1599,7 @@ public boolean isPalindrome(String s) {
     return true;
 }
 
-System.out.println(isPalindrome("A man a plan a canal Panama")); // true`
+System.out.println(isPalindrome("A man a plan a canal Panama")); // true`,
       },
       {
         title: "Coding: Anagram, Duplicates, First Unique",
@@ -939,7 +1608,7 @@ System.out.println(isPalindrome("A man a plan a canal Panama")); // true`
           "Anagram check: frequency array O(n)",
           "Find duplicates: HashMap count",
           "First non-repeating: LinkedHashMap preserves insertion order",
-          "These are the most common String coding questions"
+          "These are the most common String coding questions",
         ],
         interview: `"Most common String coding questions. Anagram check: frequency array O(n). Find duplicates: HashMap count. First non-repeating: LinkedHashMap preserves insertion order — that's the key insight they're testing."`,
         code: `// 1. Check anagram — frequency array
@@ -973,9 +1642,9 @@ public char firstUnique(String s) {
         if (e.getValue() == 1) return e.getKey();
     return '-';
 }
-// firstUnique("aabbcdd") → 'c'`
-      }
-    ]
+// firstUnique("aabbcdd") → 'c'`,
+      },
+    ],
   },
   {
     id: "springboot",
@@ -990,7 +1659,7 @@ public char firstUnique(String s) {
           "Auto-configuration based on classpath dependencies",
           "Starter POMs eliminate version conflicts",
           "Embedded server (Tomcat/Jetty) — run as fat JAR",
-          "@SpringBootApplication = @Configuration + @ComponentScan + @EnableAutoConfiguration"
+          "@SpringBootApplication = @Configuration + @ComponentScan + @EnableAutoConfiguration",
         ],
         interview: `"Spring Boot eliminates setup. It works on three principles: AUTO-CONFIGURATION (detects classpath, creates beans automatically), STARTER POMs (one dependency pulls all compatible libs), and EMBEDDED SERVER (fat JAR with Tomcat inside, perfect for Docker)."`,
         code: `@SpringBootApplication
@@ -1009,7 +1678,7 @@ public class MyApp {
 // spring.datasource.username=root
 // spring.datasource.password=secret
 // spring.jpa.hibernate.ddl-auto=update
-// spring.jpa.show-sql=true`
+// spring.jpa.show-sql=true`,
       },
       {
         title: "Stereotype Annotations",
@@ -1018,7 +1687,7 @@ public class MyApp {
           "@Component — generic Spring-managed bean",
           "@Service — business logic layer (semantic)",
           "@Repository — data access + exception translation",
-          "@RestController = @Controller + @ResponseBody"
+          "@RestController = @Controller + @ResponseBody",
         ],
         interview: `"All four tell Spring 'register this as a bean'. @Component is generic. @Service signals business logic. @Repository adds exception translation. @RestController returns JSON automatically."`,
         code: `@Component
@@ -1055,7 +1724,7 @@ public class UserController {
         return userService.findById(id);
         // Automatically converted to JSON
     }
-}`
+}`,
       },
       {
         title: "Dependency Injection",
@@ -1064,7 +1733,7 @@ public class UserController {
           "Constructor injection (preferred) — final fields, easy to test",
           "Setter injection — for optional dependencies",
           "Field injection (@Autowired) — avoid in production",
-          "@Qualifier and @Primary resolve multiple bean conflicts"
+          "@Qualifier and @Primary resolve multiple bean conflicts",
         ],
         interview: `"Spring's IoC container injects dependencies. Constructor injection is preferred — fields are final, can't be null, easy to test. @Primary picks default bean, @Qualifier specifies by name."`,
         code: `interface PaymentGateway { void pay(double amount); }
@@ -1099,7 +1768,7 @@ public class JwtService {
 
     @Value("\${app.jwt.expiry:3600}")    // 3600 is default
     private int expirySeconds;
-}`
+}`,
       },
       {
         title: "Spring Data JPA",
@@ -1108,7 +1777,7 @@ public class JwtService {
           "@Entity maps class to DB table; @Id is primary key",
           "Extend JpaRepository for free CRUD operations",
           "Derived query methods from method names",
-          "@Transactional ensures atomicity — rollback on exception"
+          "@Transactional ensures atomicity — rollback on exception",
         ],
         interview: `"Spring Data JPA eliminates boilerplate DAO code. Extend JpaRepository for free CRUD. Method names become queries automatically. @Transactional wraps in DB transaction — if anything throws, everything rolls back."`,
         code: `@Entity
@@ -1142,7 +1811,7 @@ public class OrderService {
         emailService.sendConfirmation(order);
         return order; // if email fails, order rolls back
     }
-}`
+}`,
       },
       {
         title: "Spring Security",
@@ -1151,7 +1820,7 @@ public class OrderService {
           "Chain of filters intercepts every HTTP request",
           "Authentication = who you are; Authorization = what you can do",
           "SecurityFilterChain @Bean (new way, not WebSecurityConfigurerAdapter)",
-          "BCrypt for password hashing — never plain text"
+          "BCrypt for password hashing — never plain text",
         ],
         interview: `"Spring Security works as a filter chain. Authentication proves identity, Authorization checks permissions. Use SecurityFilterChain @Bean (modern approach). For REST APIs: disable CSRF, set stateless sessions, add JWT filter."`,
         code: `@Configuration
@@ -1192,7 +1861,7 @@ public class UserController {
     public User getMyProfile(Authentication auth) {
         return userService.findByEmail(auth.getName());
     }
-}`
+}`,
       },
       {
         title: "Global Exception Handling",
@@ -1201,7 +1870,7 @@ public class UserController {
           "@ControllerAdvice intercepts exceptions from all controllers",
           "Return consistent error response structure",
           "@Valid triggers JSR-303 validation on @RequestBody",
-          "Never expose stack traces to clients"
+          "Never expose stack traces to clients",
         ],
         interview: `"Never let raw stack traces reach the client. @ControllerAdvice intercepts exceptions globally. Return consistent error structure with status, timestamp, and message. Use @Valid for input validation."`,
         code: `public class ResourceNotFoundException extends RuntimeException {
@@ -1239,15 +1908,31 @@ public class GlobalExceptionHandler {
             500, "Internal Error", "Something went wrong", LocalDateTime.now());
         return ResponseEntity.internalServerError().body(err);
     }
-}`
-      }
+}`,
+      },
     ],
     trapQuestions: [
-      { question: "@Component vs @Bean?", answer: "@Component is class-level, auto-scanned. @Bean is method-level inside @Configuration — used for third-party classes you can't annotate." },
-      { question: "@RestController vs @Controller?", answer: "@RestController = @Controller + @ResponseBody. Every method returns JSON. @Controller returns view names." },
-      { question: "When does @Transactional NOT work?", answer: "Self-invocation — calling a @Transactional method from within the same class bypasses the Spring proxy. Also doesn't work on private methods." },
-      { question: "@PathVariable vs @RequestParam?", answer: "@PathVariable extracts from URL path: /users/{id}. @RequestParam from query string: /users?id=5." }
-    ]
+      {
+        question: "@Component vs @Bean?",
+        answer:
+          "@Component is class-level, auto-scanned. @Bean is method-level inside @Configuration — used for third-party classes you can't annotate.",
+      },
+      {
+        question: "@RestController vs @Controller?",
+        answer:
+          "@RestController = @Controller + @ResponseBody. Every method returns JSON. @Controller returns view names.",
+      },
+      {
+        question: "When does @Transactional NOT work?",
+        answer:
+          "Self-invocation — calling a @Transactional method from within the same class bypasses the Spring proxy. Also doesn't work on private methods.",
+      },
+      {
+        question: "@PathVariable vs @RequestParam?",
+        answer:
+          "@PathVariable extracts from URL path: /users/{id}. @RequestParam from query string: /users?id=5.",
+      },
+    ],
   },
   {
     id: "annotations",
@@ -1262,7 +1947,7 @@ public class GlobalExceptionHandler {
           "@Component, @Service, @Repository, @Controller — bean registration",
           "@Bean for third-party classes in @Configuration",
           "@Autowired, @Qualifier, @Primary — dependency injection",
-          "@PostConstruct, @PreDestroy — lifecycle hooks"
+          "@PostConstruct, @PreDestroy — lifecycle hooks",
         ],
         interview: `"These are the foundation. @Component family registers beans. @Autowired injects them. @PostConstruct runs after creation, @PreDestroy before shutdown."`,
         code: `// Bean Registration
@@ -1286,7 +1971,7 @@ public class GlobalExceptionHandler {
 
 // Lifecycle
 @PostConstruct      // run after bean creation
-@PreDestroy         // run before shutdown`
+@PreDestroy         // run before shutdown`,
       },
       {
         title: "Spring MVC & REST Annotations",
@@ -1295,7 +1980,7 @@ public class GlobalExceptionHandler {
           "@GetMapping, @PostMapping, @PutMapping, @DeleteMapping",
           "@PathVariable from URL, @RequestParam from query string",
           "@RequestBody deserializes JSON to Java object",
-          "@Valid triggers validation on request body"
+          "@Valid triggers validation on request body",
         ],
         interview: `"Know the difference between each @Mapping annotation and how to extract data from URL path, query params, request body, and headers."`,
         code: `// Request Mapping
@@ -1321,7 +2006,7 @@ public class GlobalExceptionHandler {
 // Validation & Errors
 @Valid              // trigger validation
 @ControllerAdvice   // global exception handler
-@ExceptionHandler   // handle specific exception type`
+@ExceptionHandler   // handle specific exception type`,
       },
       {
         title: "JPA & Database Annotations",
@@ -1330,7 +2015,7 @@ public class GlobalExceptionHandler {
           "@Entity, @Table, @Id, @GeneratedValue — entity mapping",
           "@OneToMany, @ManyToOne, @ManyToMany — relationships",
           "FetchType.LAZY vs EAGER — performance implications",
-          "@Transactional — atomic operations"
+          "@Transactional — atomic operations",
         ],
         interview: `"JPA annotations map objects to tables. Know @Entity, @Id, relationships, and especially LAZY vs EAGER fetch types."`,
         code: `// Entity Mapping
@@ -1356,14 +2041,26 @@ public class GlobalExceptionHandler {
 // Query
 @Query              // custom JPQL or native SQL
 @Modifying          // for UPDATE/DELETE queries
-@Transactional      // wrap in DB transaction`
-      }
+@Transactional      // wrap in DB transaction`,
+      },
     ],
     trapQuestions: [
-      { question: "@Component vs @Service vs @Repository — real difference?", answer: "@Component is generic. @Service is semantic. @Repository activates exception translation — Hibernate exceptions become Spring's DataAccessException." },
-      { question: "@Transactional on a private method — does it work?", answer: "No. Spring AOP uses proxies. Private methods can't be overridden, so the proxy can't intercept them." },
-      { question: "@Cacheable vs @CachePut?", answer: "@Cacheable skips the method on cache hit. @CachePut always runs and updates cache. Use @CachePut on writes to keep cache in sync." }
-    ]
+      {
+        question: "@Component vs @Service vs @Repository — real difference?",
+        answer:
+          "@Component is generic. @Service is semantic. @Repository activates exception translation — Hibernate exceptions become Spring's DataAccessException.",
+      },
+      {
+        question: "@Transactional on a private method — does it work?",
+        answer:
+          "No. Spring AOP uses proxies. Private methods can't be overridden, so the proxy can't intercept them.",
+      },
+      {
+        question: "@Cacheable vs @CachePut?",
+        answer:
+          "@Cacheable skips the method on cache hit. @CachePut always runs and updates cache. Use @CachePut on writes to keep cache in sync.",
+      },
+    ],
   },
   {
     id: "datastructures",
@@ -1378,7 +2075,7 @@ public class GlobalExceptionHandler {
           "Fixed-size, contiguous memory, zero-indexed",
           "O(1) random access by index",
           "O(n) insertion/deletion (shift elements)",
-          "Use ArrayList for dynamic sizing in Java"
+          "Use ArrayList for dynamic sizing in Java",
         ],
         interview: `"Arrays store elements in contiguous memory, giving O(1) access by index. The trade-off is fixed size and O(n) insert/delete because elements must shift. In Java I use ArrayList when I need dynamic sizing — it's backed by an array that auto-resizes."`,
         code: `// Fixed-size array
@@ -1406,7 +2103,7 @@ list.size();        // 1
 int[] arr = {5, 3, 1, 4, 2};
 Arrays.sort(arr);                    // O(n log n)
 int idx = Arrays.binarySearch(arr, 3); // O(log n)
-Arrays.fill(arr, 0);                // fill all with 0`
+Arrays.fill(arr, 0);                // fill all with 0`,
       },
       {
         title: "Linked List",
@@ -1415,7 +2112,7 @@ Arrays.fill(arr, 0);                // fill all with 0`
           "Nodes linked via pointers — no contiguous memory needed",
           "O(1) insert/delete at head; O(n) to find by index",
           "Singly vs Doubly linked (Java's LinkedList is doubly)",
-          "Use when frequent insert/delete at ends, rare random access"
+          "Use when frequent insert/delete at ends, rare random access",
         ],
         interview: `"LinkedList nodes point to the next (and optionally previous) node. Insert/delete at head is O(1) — no shifting. But random access is O(n) because you must traverse. Java's LinkedList is doubly-linked and implements both List and Deque."`,
         code: `// Java's built-in LinkedList (doubly-linked)
@@ -1451,7 +2148,7 @@ ListNode reverse(ListNode head) {
         curr = next;
     }
     return prev; // new head
-}`
+}`,
       },
       {
         title: "Stack",
@@ -1460,7 +2157,7 @@ ListNode reverse(ListNode head) {
           "Last In, First Out (LIFO) principle",
           "push(), pop(), peek() — all O(1)",
           "Use Deque (ArrayDeque) instead of legacy Stack class",
-          "Use cases: undo, back button, expression evaluation, DFS"
+          "Use cases: undo, back button, expression evaluation, DFS",
         ],
         interview: `"Stack follows LIFO — last element in is first out. In Java, don't use the legacy Stack class (it extends Vector, which is synchronized). Use ArrayDeque as a stack — push/pop/peek are all O(1)."`,
         code: `// Use ArrayDeque as Stack (preferred over Stack class)
@@ -1488,7 +2185,7 @@ boolean isValid(String s) {
 }
 
 isValid("({[]})"); // true
-isValid("([)]");   // false`
+isValid("([)]");   // false`,
       },
       {
         title: "Queue",
@@ -1497,7 +2194,7 @@ isValid("([)]");   // false`
           "First In, First Out (FIFO) principle",
           "offer(), poll(), peek() — all O(1) with LinkedList/ArrayDeque",
           "Use cases: BFS, task scheduling, message queues",
-          "LinkedList or ArrayDeque as implementation"
+          "LinkedList or ArrayDeque as implementation",
         ],
         interview: `"Queue follows FIFO — first in, first out. Like a line at a coffee shop. In Java, use LinkedList or ArrayDeque as the implementation. Key operations: offer (enqueue), poll (dequeue), peek — all O(1)."`,
         code: `// Queue using LinkedList
@@ -1523,7 +2220,7 @@ void bfs(TreeNode root) {
         if (node.left != null)  queue.offer(node.left);
         if (node.right != null) queue.offer(node.right);
     }
-}`
+}`,
       },
       {
         title: "Deque (Double-Ended Queue)",
@@ -1532,7 +2229,7 @@ void bfs(TreeNode root) {
           "Insert/remove from both front and back in O(1)",
           "Can be used as both Stack and Queue",
           "ArrayDeque — faster than LinkedList for most cases",
-          "Use cases: sliding window, palindrome check"
+          "Use cases: sliding window, palindrome check",
         ],
         interview: `"Deque supports insert/remove at both ends in O(1). ArrayDeque is the go-to implementation — faster than LinkedList due to cache locality. It can serve as both a stack (push/pop) and a queue (offerLast/pollFirst)."`,
         code: `Deque<Integer> deque = new ArrayDeque<>();
@@ -1570,7 +2267,7 @@ int[] maxSlidingWindow(int[] nums, int k) {
         if (i >= k - 1) result[i - k + 1] = nums[dq.peekFirst()];
     }
     return result;
-}`
+}`,
       },
       {
         title: "HashMap / Hash Table",
@@ -1579,7 +2276,7 @@ int[] maxSlidingWindow(int[] nums, int k) {
           "O(1) average for get, put, containsKey",
           "Uses hashCode() + equals() for key lookup",
           "Handles collisions: chaining (Java 8: treeify at 8)",
-          "Not thread-safe — use ConcurrentHashMap for threads"
+          "Not thread-safe — use ConcurrentHashMap for threads",
         ],
         interview: `"HashMap gives O(1) average lookup using hashCode. Keys must properly implement hashCode() and equals(). Java 8 converts chains to red-black trees at 8 nodes for O(log n) worst case. For thread safety, use ConcurrentHashMap."`,
         code: `Map<String, Integer> map = new HashMap<>();
@@ -1610,7 +2307,7 @@ for (char c : s.toCharArray()) {
 Map<String, Integer> ordered = new LinkedHashMap<>();
 
 // TreeMap — sorted by key, O(log n)
-Map<String, Integer> sorted = new TreeMap<>();`
+Map<String, Integer> sorted = new TreeMap<>();`,
       },
       {
         title: "Set",
@@ -1619,7 +2316,7 @@ Map<String, Integer> sorted = new TreeMap<>();`
           "Stores unique elements only — no duplicates",
           "HashSet: O(1) add/remove/contains, unordered",
           "TreeSet: O(log n), sorted — backed by red-black tree",
-          "LinkedHashSet: O(1), preserves insertion order"
+          "LinkedHashSet: O(1), preserves insertion order",
         ],
         interview: `"Set guarantees uniqueness. HashSet gives O(1) operations but no order. TreeSet gives sorted order at O(log n). LinkedHashSet preserves insertion order. Choose based on whether you need ordering."`,
         code: `Set<String> set = new HashSet<>();
@@ -1653,7 +2350,7 @@ Set<Integer> inter = new HashSet<>(a);
 inter.retainAll(b);     // [2, 3]
 
 Set<Integer> diff = new HashSet<>(a);
-diff.removeAll(b);      // [1]`
+diff.removeAll(b);      // [1]`,
       },
       {
         title: "Tree & Binary Tree",
@@ -1662,7 +2359,7 @@ diff.removeAll(b);      // [1]`
           "Hierarchical structure — root, children, leaves",
           "Binary tree: each node has at most 2 children",
           "Traversals: inorder, preorder, postorder, level-order",
-          "Height-balanced trees ensure O(log n) operations"
+          "Height-balanced trees ensure O(log n) operations",
         ],
         interview: `"A tree is hierarchical — each node has zero or more children. A binary tree limits this to two. Three classic traversals: inorder (left-root-right), preorder (root-left-right), postorder (left-right-root). BFS gives level-order."`,
         code: `class TreeNode {
@@ -1714,7 +2411,7 @@ List<List<Integer>> levelOrder(TreeNode root) {
         result.add(level);
     }
     return result;
-}`
+}`,
       },
       {
         title: "Binary Search Tree (BST)",
@@ -1723,7 +2420,7 @@ List<List<Integer>> levelOrder(TreeNode root) {
           "Left child < parent < right child",
           "O(log n) search/insert/delete for balanced BSTs",
           "Inorder traversal gives sorted output",
-          "Degenerates to O(n) if unbalanced — fix with AVL/Red-Black"
+          "Degenerates to O(n) if unbalanced — fix with AVL/Red-Black",
         ],
         interview: `"BST maintains left < root < right invariant. This gives O(log n) search when balanced. Inorder traversal of a BST gives sorted output — that's a common interview trick. If unbalanced, it degenerates to a linked list with O(n) operations."`,
         code: `class BST {
@@ -1762,7 +2459,7 @@ List<List<Integer>> levelOrder(TreeNode root) {
             return lca(root.right, p, q);
         return root; // split point = LCA
     }
-}`
+}`,
       },
       {
         title: "Heap / Priority Queue",
@@ -1771,7 +2468,7 @@ List<List<Integer>> levelOrder(TreeNode root) {
           "Complete binary tree with heap property",
           "Min-heap: parent ≤ children (Java default)",
           "O(log n) insert/remove, O(1) peek at min/max",
-          "Use cases: top-K, median finding, Dijkstra's"
+          "Use cases: top-K, median finding, Dijkstra's",
         ],
         interview: `"A heap is a complete binary tree where the parent is always smaller (min-heap) or larger (max-heap) than children. Java's PriorityQueue is a min-heap by default. Insert and remove are O(log n), peek is O(1). Essential for top-K problems."`,
         code: `// Min-Heap (default in Java)
@@ -1804,7 +2501,7 @@ int[] topKFrequent(int[] nums, int k) {
     for (int i = 0; i < k; i++)
         result[i] = heap.poll().getKey();
     return result;
-}`
+}`,
       },
       {
         title: "Graph",
@@ -1813,7 +2510,7 @@ int[] topKFrequent(int[] nums, int k) {
           "Nodes (vertices) connected by edges",
           "Directed vs undirected, weighted vs unweighted",
           "Representations: adjacency list (sparse) vs matrix (dense)",
-          "Traversals: BFS (shortest path), DFS (explore fully)"
+          "Traversals: BFS (shortest path), DFS (explore fully)",
         ],
         interview: `"A graph is nodes connected by edges. Adjacency list is preferred for sparse graphs (most real-world cases). BFS finds shortest path in unweighted graphs, DFS explores all paths. Know both iterative and recursive DFS."`,
         code: `// Adjacency List representation
@@ -1852,7 +2549,7 @@ void dfs(Map<Integer, List<Integer>> graph,
             dfs(graph, neighbor, visited);
         }
     }
-}`
+}`,
       },
       {
         title: "Trie (Prefix Tree)",
@@ -1861,7 +2558,7 @@ void dfs(Map<Integer, List<Integer>> graph,
           "Tree structure for efficient prefix-based string search",
           "Each node represents a character",
           "O(m) search/insert where m = word length",
-          "Use cases: autocomplete, spell check, IP routing"
+          "Use cases: autocomplete, spell check, IP routing",
         ],
         interview: `"A Trie stores strings character-by-character in a tree. Each path from root represents a prefix. Search and insert are O(m) where m is word length — independent of how many words are stored. Perfect for autocomplete and prefix matching."`,
         code: `class TrieNode {
@@ -1907,7 +2604,7 @@ Trie trie = new Trie();
 trie.insert("apple");
 trie.search("apple");     // true
 trie.search("app");       // false
-trie.startsWith("app");   // true`
+trie.startsWith("app");   // true`,
       },
       {
         title: "Disjoint Set (Union-Find)",
@@ -1916,7 +2613,7 @@ trie.startsWith("app");   // true`
           "Tracks connected components in a graph",
           "Two operations: find (which set?) and union (merge sets)",
           "Path compression + union by rank → near O(1) amortized",
-          "Use cases: Kruskal's MST, cycle detection, connected components"
+          "Use cases: Kruskal's MST, cycle detection, connected components",
         ],
         interview: `"Union-Find tracks which elements belong to the same group. Find returns the root of a set, Union merges two sets. With path compression and union by rank, both operations are nearly O(1). Essential for Kruskal's MST and detecting cycles in undirected graphs."`,
         code: `class UnionFind {
@@ -1957,15 +2654,31 @@ boolean hasCycle(int n, int[][] edges) {
         if (!uf.union(e[0], e[1])) return true;
     }
     return false;
-}`
-      }
+}`,
+      },
     ],
     trapQuestions: [
-      { question: "When would you use LinkedList over ArrayList?", answer: "When you need frequent insertions/deletions at the head or middle. ArrayList wins for random access and iteration due to cache locality." },
-      { question: "HashMap vs TreeMap vs LinkedHashMap?", answer: "HashMap: O(1) unordered. TreeMap: O(log n) sorted by key. LinkedHashMap: O(1) insertion-ordered. Choose based on ordering needs." },
-      { question: "Why use ArrayDeque instead of Stack class?", answer: "Stack extends Vector (synchronized, slow). ArrayDeque is faster, not synchronized, and implements the Deque interface properly." },
-      { question: "What happens when HashMap exceeds load factor?", answer: "It doubles capacity and rehashes all entries. Default load factor is 0.75, initial capacity is 16." }
-    ]
+      {
+        question: "When would you use LinkedList over ArrayList?",
+        answer:
+          "When you need frequent insertions/deletions at the head or middle. ArrayList wins for random access and iteration due to cache locality.",
+      },
+      {
+        question: "HashMap vs TreeMap vs LinkedHashMap?",
+        answer:
+          "HashMap: O(1) unordered. TreeMap: O(log n) sorted by key. LinkedHashMap: O(1) insertion-ordered. Choose based on ordering needs.",
+      },
+      {
+        question: "Why use ArrayDeque instead of Stack class?",
+        answer:
+          "Stack extends Vector (synchronized, slow). ArrayDeque is faster, not synchronized, and implements the Deque interface properly.",
+      },
+      {
+        question: "What happens when HashMap exceeds load factor?",
+        answer:
+          "It doubles capacity and rehashes all entries. Default load factor is 0.75, initial capacity is 16.",
+      },
+    ],
   },
   {
     id: "databases",
@@ -1980,7 +2693,7 @@ boolean hasCycle(int n, int[][] edges) {
           "Data stored in tables with rows and columns",
           "Schema-defined structure with data types",
           "Relationships via foreign keys",
-          "Examples: PostgreSQL, MySQL, Oracle, SQL Server"
+          "Examples: PostgreSQL, MySQL, Oracle, SQL Server",
         ],
         interview: `"A relational database organizes data into tables with predefined schemas. Tables relate to each other through foreign keys. The strength is data integrity through constraints, ACID transactions, and a powerful query language (SQL). PostgreSQL and MySQL are the most common."`,
         code: `-- Create a table with constraints
@@ -2006,7 +2719,7 @@ UPDATE users SET name = 'Jane Doe'
 WHERE id = 1;
 
 -- Delete
-DELETE FROM users WHERE id = 1;`
+DELETE FROM users WHERE id = 1;`,
       },
       {
         title: "SQL vs NoSQL",
@@ -2015,7 +2728,7 @@ DELETE FROM users WHERE id = 1;`
           "SQL: structured, schema-enforced, ACID, vertical scaling",
           "NoSQL: flexible schema, BASE, horizontal scaling",
           "NoSQL types: document, key-value, column, graph",
-          "Choose based on data structure, scale, and consistency needs"
+          "Choose based on data structure, scale, and consistency needs",
         ],
         interview: `"SQL databases enforce a schema and provide ACID guarantees — great for financial data, relationships, and complex queries. NoSQL offers flexible schemas and horizontal scaling — ideal for high-volume, rapidly evolving data like social feeds or IoT. It's not one vs the other — many systems use both."`,
         code: `-- SQL: Structured, relational
@@ -2044,7 +2757,7 @@ GROUP BY u.name;
 -- When to use what:
 -- SQL:   Banking, ERP, e-commerce (relationships matter)
 -- NoSQL: Real-time analytics, content mgmt, IoT
---        (flexibility + scale matter)`
+--        (flexibility + scale matter)`,
       },
       {
         title: "Primary Key & Foreign Key",
@@ -2053,7 +2766,7 @@ GROUP BY u.name;
           "Primary key: uniquely identifies each row, cannot be NULL",
           "Foreign key: references primary key of another table",
           "Composite key: multiple columns forming the primary key",
-          "Foreign keys enforce referential integrity"
+          "Foreign keys enforce referential integrity",
         ],
         interview: `"A primary key uniquely identifies each row — it must be unique and non-null. A foreign key creates a relationship by referencing another table's primary key. This enforces referential integrity — you can't insert an order for a user that doesn't exist."`,
         code: `-- Primary Key
@@ -2083,7 +2796,7 @@ CREATE TABLE orders (
 
 -- This will FAIL if user_id 999 doesn't exist:
 INSERT INTO orders (user_id, total)
-VALUES (999, 49.99);  -- ERROR: foreign key violation`
+VALUES (999, 49.99);  -- ERROR: foreign key violation`,
       },
       {
         title: "Indexes",
@@ -2092,7 +2805,7 @@ VALUES (999, 49.99);  -- ERROR: foreign key violation`
           "Speed up SELECT queries at the cost of slower writes",
           "B-Tree index: default, good for range queries and equality",
           "Hash index: O(1) equality lookups only",
-          "Composite index: multi-column, leftmost prefix rule"
+          "Composite index: multi-column, leftmost prefix rule",
         ],
         interview: `"An index is like a book's index — instead of scanning every page, you jump to the right one. B-Tree indexes handle both equality and range queries. The trade-off: faster reads but slower writes because the index must be updated. Don't over-index — each index costs storage and write performance."`,
         code: `-- Create index on frequently queried column
@@ -2122,7 +2835,7 @@ SELECT * FROM users WHERE email = 'john@example.com';
 -- Look for "Index Scan" vs "Seq Scan"
 
 -- Drop index
-DROP INDEX idx_users_email;`
+DROP INDEX idx_users_email;`,
       },
       {
         title: "Normalization",
@@ -2131,7 +2844,7 @@ DROP INDEX idx_users_email;`
           "1NF: atomic values, no repeating groups",
           "2NF: 1NF + no partial dependencies on composite keys",
           "3NF: 2NF + no transitive dependencies",
-          "Denormalize strategically for read-heavy workloads"
+          "Denormalize strategically for read-heavy workloads",
         ],
         interview: `"Normalization reduces data redundancy. 1NF means atomic values. 2NF eliminates partial dependencies. 3NF removes transitive dependencies. In practice, I normalize for write-heavy systems and denormalize for read-heavy ones — it's a trade-off between consistency and performance."`,
         code: `-- UNNORMALIZED (bad)
@@ -2166,7 +2879,7 @@ CREATE TABLE order_items (
 
 -- 3NF: Remove transitive dependencies
 -- Bad: orders has zip_code AND city (city depends on zip)
--- Fix: separate address table`
+-- Fix: separate address table`,
       },
       {
         title: "ACID Properties",
@@ -2175,7 +2888,7 @@ CREATE TABLE order_items (
           "Atomicity: all or nothing — partial commits impossible",
           "Consistency: DB moves from one valid state to another",
           "Isolation: concurrent transactions don't interfere",
-          "Durability: committed data survives crashes"
+          "Durability: committed data survives crashes",
         ],
         interview: `"ACID guarantees reliable transactions. Atomicity means all-or-nothing. Consistency ensures valid state transitions. Isolation prevents concurrent transactions from interfering. Durability means committed data survives crashes. This is why banks use relational databases."`,
         code: `-- ACID in action: Bank Transfer
@@ -2201,7 +2914,7 @@ COMMIT;
 -- REPEATABLE READ   → no non-repeatable reads (MySQL default)
 -- SERIALIZABLE      → full isolation, slowest
 
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`,
       },
       {
         title: "Joins",
@@ -2210,7 +2923,7 @@ SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
           "INNER JOIN: only matching rows from both tables",
           "LEFT JOIN: all from left + matching from right",
           "RIGHT JOIN: all from right + matching from left",
-          "FULL OUTER JOIN: all rows from both tables"
+          "FULL OUTER JOIN: all rows from both tables",
         ],
         interview: `"INNER JOIN returns only matching rows. LEFT JOIN returns everything from the left table plus matches from the right — unmatched rows get NULLs. This is the most common in practice. FULL OUTER JOIN returns everything from both sides."`,
         code: `-- Sample data
@@ -2246,7 +2959,7 @@ FULL OUTER JOIN orders o ON u.id = o.user_id;
 -- Self Join: employees with their managers
 SELECT e.name AS employee, m.name AS manager
 FROM employees e
-LEFT JOIN employees m ON e.manager_id = m.id;`
+LEFT JOIN employees m ON e.manager_id = m.id;`,
       },
       {
         title: "Isolation Levels",
@@ -2255,7 +2968,7 @@ LEFT JOIN employees m ON e.manager_id = m.id;`
           "READ UNCOMMITTED: fastest, allows dirty reads",
           "READ COMMITTED: prevents dirty reads (PostgreSQL default)",
           "REPEATABLE READ: prevents non-repeatable reads (MySQL default)",
-          "SERIALIZABLE: full isolation, highest consistency, lowest throughput"
+          "SERIALIZABLE: full isolation, highest consistency, lowest throughput",
         ],
         interview: `"Isolation levels control the trade-off between consistency and performance. READ COMMITTED prevents dirty reads — you only see committed data. REPEATABLE READ ensures you see the same data if you query twice in one transaction. SERIALIZABLE is the strictest — transactions behave as if they run one at a time."`,
         code: `-- Dirty Read (READ UNCOMMITTED)
@@ -2280,7 +2993,7 @@ BEGIN;
 SELECT * FROM inventory WHERE product_id = 1;
 -- No other transaction can modify this row
 UPDATE inventory SET qty = qty - 1 WHERE product_id = 1;
-COMMIT;`
+COMMIT;`,
       },
       {
         title: "CAP Theorem",
@@ -2289,7 +3002,7 @@ COMMIT;`
           "Consistency: every read gets the latest write",
           "Availability: every request gets a response",
           "Partition Tolerance: system works despite network failures",
-          "You can only guarantee 2 out of 3 during a partition"
+          "You can only guarantee 2 out of 3 during a partition",
         ],
         interview: `"CAP theorem says in a distributed system during a network partition, you must choose between consistency and availability. CP systems (like HBase) reject requests to stay consistent. AP systems (like Cassandra) serve stale data to stay available. In practice, it's about the trade-off during failures."`,
         code: `-- CAP Theorem — pick 2 during a partition
@@ -2315,7 +3028,7 @@ COMMIT;`
 --   double-charge
 
 -- Most systems are "eventually consistent" (AP)
--- with tunable consistency levels`
+-- with tunable consistency levels`,
       },
       {
         title: "Sharding",
@@ -2324,7 +3037,7 @@ COMMIT;`
           "Split data across multiple database instances",
           "Shard key determines which shard stores each row",
           "Horizontal scaling — add more machines, not bigger ones",
-          "Challenges: cross-shard queries, rebalancing, hotspots"
+          "Challenges: cross-shard queries, rebalancing, hotspots",
         ],
         interview: `"Sharding splits data horizontally across multiple databases. Each shard holds a subset of the data based on a shard key. It enables horizontal scaling — handling more data by adding machines. The challenge is choosing the right shard key to avoid hotspots and making cross-shard queries efficient."`,
         code: `-- Sharding by user_id (range-based)
@@ -2350,7 +3063,7 @@ COMMIT;`
 -- Shard key selection:
 -- Good: user_id (even distribution)
 -- Bad:  country (US shard overloaded)
--- Bad:  created_at (latest shard always hot)`
+-- Bad:  created_at (latest shard always hot)`,
       },
       {
         title: "Replication",
@@ -2359,7 +3072,7 @@ COMMIT;`
           "Copy data across multiple servers for redundancy",
           "Master-slave: one writer, multiple readers",
           "Master-master: multiple writers (conflict resolution needed)",
-          "Synchronous vs asynchronous replication trade-offs"
+          "Synchronous vs asynchronous replication trade-offs",
         ],
         interview: `"Replication copies data across servers for high availability and read scaling. Master-slave is most common — writes go to the master, reads can go to any replica. The trade-off is replication lag — a read from a replica might return slightly stale data. Synchronous replication eliminates lag but adds write latency."`,
         code: `-- Master-Slave Replication
@@ -2386,15 +3099,31 @@ COMMIT;`
 
 -- PostgreSQL streaming replication config:
 -- primary: wal_level = replica
--- replica: primary_conninfo = 'host=master port=5432'`
-      }
+-- replica: primary_conninfo = 'host=master port=5432'`,
+      },
     ],
     trapQuestions: [
-      { question: "When would you denormalize a database?", answer: "For read-heavy workloads where JOIN performance is a bottleneck. Common in analytics, dashboards, and caching layers. Accept data redundancy for query speed." },
-      { question: "Can you have both ACID and horizontal scaling?", answer: "It's very hard. Google Spanner does it with TrueTime. CockroachDB approximates it. Most systems sacrifice strict consistency for scalability (eventual consistency)." },
-      { question: "INDEX on every column — good idea?", answer: "No. Each index slows writes and uses storage. Only index columns used in WHERE, JOIN, and ORDER BY clauses that are queried frequently." },
-      { question: "LEFT JOIN vs LEFT OUTER JOIN?", answer: "They're identical. OUTER is optional syntax. Same for RIGHT JOIN = RIGHT OUTER JOIN." }
-    ]
+      {
+        question: "When would you denormalize a database?",
+        answer:
+          "For read-heavy workloads where JOIN performance is a bottleneck. Common in analytics, dashboards, and caching layers. Accept data redundancy for query speed.",
+      },
+      {
+        question: "Can you have both ACID and horizontal scaling?",
+        answer:
+          "It's very hard. Google Spanner does it with TrueTime. CockroachDB approximates it. Most systems sacrifice strict consistency for scalability (eventual consistency).",
+      },
+      {
+        question: "INDEX on every column — good idea?",
+        answer:
+          "No. Each index slows writes and uses storage. Only index columns used in WHERE, JOIN, and ORDER BY clauses that are queried frequently.",
+      },
+      {
+        question: "LEFT JOIN vs LEFT OUTER JOIN?",
+        answer:
+          "They're identical. OUTER is optional syntax. Same for RIGHT JOIN = RIGHT OUTER JOIN.",
+      },
+    ],
   },
   {
     id: "microservices",
@@ -2409,7 +3138,7 @@ COMMIT;`
           "Services are independently deployable",
           "Each service focuses on one business capability",
           "Services communicate using REST APIs or message brokers",
-          "Enables independent scaling"
+          "Enables independent scaling",
         ],
         interview: `"Microservices architecture is a software design approach where a large application is divided into small independent services. Each service handles a specific business capability and communicates with other services using APIs or messaging."`,
         code: `// Instead of one monolithic e-commerce application:
@@ -2431,7 +3160,7 @@ public class OrderServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderServiceApplication.class, args);
     }
-}`
+}`,
       },
       {
         title: "Spring Cloud",
@@ -2440,7 +3169,7 @@ public class OrderServiceApplication {
           "Provides tools for building distributed systems",
           "Solves configuration management, service discovery, fault tolerance",
           "Built on top of Spring Boot",
-          "Integrates with Netflix OSS, Resilience4j, and more"
+          "Integrates with Netflix OSS, Resilience4j, and more",
         ],
         interview: `"Spring Cloud provides tools and frameworks for building distributed systems and microservices. It solves common microservice challenges such as configuration management, service discovery, and fault tolerance."`,
         code: `// Core Spring Cloud dependencies (pom.xml)
@@ -2461,7 +3190,7 @@ public class OrderServiceApplication {
 // spring-cloud-netflix      → Eureka service discovery
 // spring-cloud-openfeign    → declarative REST clients
 // spring-cloud-gateway      → API gateway
-// spring-cloud-circuitbreaker → fault tolerance`
+// spring-cloud-circuitbreaker → fault tolerance`,
       },
       {
         title: "Config Server",
@@ -2470,7 +3199,7 @@ public class OrderServiceApplication {
           "Centralized configuration management for all microservices",
           "Configuration stored in Git repository",
           "Services fetch config at runtime",
-          "Supports environment-specific profiles"
+          "Supports environment-specific profiles",
         ],
         interview: `"A Config Server provides centralized configuration management for microservices. Configuration files are stored in a central repository such as Git and fetched by services at runtime."`,
         code: `@EnableConfigServer
@@ -2483,7 +3212,7 @@ public class ConfigServerApplication {
 
 // application.properties
 server.port=8888
-spring.cloud.config.server.git.uri=https://github.com/config-repo`
+spring.cloud.config.server.git.uri=https://github.com/config-repo`,
       },
       {
         title: "Config Client",
@@ -2492,7 +3221,7 @@ spring.cloud.config.server.git.uri=https://github.com/config-repo`
           "Microservice that retrieves config from Config Server",
           "Uses bootstrap.properties to locate Config Server",
           "Config loaded before application context starts",
-          "Supports dynamic refresh with @RefreshScope"
+          "Supports dynamic refresh with @RefreshScope",
         ],
         interview: `"A Config Client is a microservice that retrieves its configuration from the Config Server during startup. It connects using the Config Server URI defined in bootstrap.properties."`,
         code: `// bootstrap.properties
@@ -2513,7 +3242,7 @@ public class UserController {
     public String greet() {
         return message;
     }
-}`
+}`,
       },
       {
         title: "Service Discovery",
@@ -2522,7 +3251,7 @@ public class UserController {
           "Allows services to dynamically locate each other",
           "No hardcoded IP addresses or ports",
           "Services register themselves on startup",
-          "Clients query registry to find service instances"
+          "Clients query registry to find service instances",
         ],
         interview: `"Service discovery allows microservices to dynamically locate other services without hardcoding their IP addresses. Services register with a registry on startup and other services look them up by name."`,
         code: `// Without service discovery:
@@ -2536,7 +3265,7 @@ String url = "http://user-service/users";  // resolved dynamically
 // 2. order-service needs user-service
 // 3. order-service asks Eureka: "Where is user-service?"
 // 4. Eureka returns: 192.168.1.50:8081
-// 5. order-service calls that address`
+// 5. order-service calls that address`,
       },
       {
         title: "Eureka Server",
@@ -2545,7 +3274,7 @@ String url = "http://user-service/users";  // resolved dynamically
           "Service registry that tracks all running microservices",
           "Services send periodic heartbeats",
           "Removes services that stop sending heartbeats",
-          "Provides a dashboard to view registered services"
+          "Provides a dashboard to view registered services",
         ],
         interview: `"Eureka Server is a service registry that keeps track of all running microservices in the system. Each service registers itself and sends heartbeats to indicate it's alive."`,
         code: `@EnableEurekaServer
@@ -2561,7 +3290,7 @@ server.port=8761
 eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false
 
-// Dashboard available at http://localhost:8761`
+// Dashboard available at http://localhost:8761`,
       },
       {
         title: "Eureka Client",
@@ -2570,7 +3299,7 @@ eureka.client.fetch-registry=false
           "Microservice that registers itself with Eureka Server",
           "Discovers other services by their registered name",
           "Sends heartbeats to maintain registration",
-          "Automatically deregisters on shutdown"
+          "Automatically deregisters on shutdown",
         ],
         interview: `"A Eureka Client is a microservice that registers itself with the Eureka Server and discovers other services. It uses the service name instead of hardcoded URLs."`,
         code: `// application.properties
@@ -2586,7 +3315,7 @@ public class UserServiceApplication {
 }
 
 // Now other services can call:
-// http://user-service/users  → resolved by Eureka`
+// http://user-service/users  → resolved by Eureka`,
       },
       {
         title: "OpenFeign",
@@ -2595,7 +3324,7 @@ public class UserServiceApplication {
           "Declarative REST client for inter-service communication",
           "Define interface + annotations, Spring implements it",
           "Integrates with Eureka for service discovery",
-          "Supports load balancing automatically"
+          "Supports load balancing automatically",
         ],
         interview: `"OpenFeign is a declarative REST client used to simplify communication between microservices. You define an interface with annotations and Spring generates the implementation."`,
         code: `@FeignClient(name = "user-service")
@@ -2618,7 +3347,7 @@ public class OrderService {
         User user = userClient.getUser(userId);
         return new Order(user, LocalDateTime.now());
     }
-}`
+}`,
       },
       {
         title: "Circuit Breaker",
@@ -2627,7 +3356,7 @@ public class OrderService {
           "Prevents repeated calls to a failing service",
           "Three states: Closed (normal), Open (failing), Half-Open (testing)",
           "Returns fallback responses when circuit is open",
-          "Protects system from cascading failures"
+          "Protects system from cascading failures",
         ],
         interview: `"A Circuit Breaker prevents repeated calls to a failing service. When failures exceed a threshold, the circuit opens and fallback responses are returned instead."`,
         code: `// Circuit Breaker States:
@@ -2645,7 +3374,7 @@ public class OrderService {
 // Thread pool exhausted → Service A also fails!
 
 // With circuit breaker:
-// Service A → Circuit Breaker → fallback response (instant)`
+// Service A → Circuit Breaker → fallback response (instant)`,
       },
       {
         title: "Resilience4j",
@@ -2654,7 +3383,7 @@ public class OrderService {
           "Lightweight fault tolerance library for Spring Boot",
           "Implements Circuit Breaker, Retry, Rate Limiter, Bulkhead",
           "Annotation-driven with @CircuitBreaker, @Retry",
-          "Replaces Netflix Hystrix (deprecated)"
+          "Replaces Netflix Hystrix (deprecated)",
         ],
         interview: `"Resilience4j is a lightweight fault tolerance library used with Spring Boot to implement patterns such as Circuit Breaker, Retry, Rate Limiter, and Bulkhead. It replaced the deprecated Netflix Hystrix."`,
         code: `@CircuitBreaker(name = "userService", fallbackMethod = "fallbackUser")
@@ -2676,7 +3405,7 @@ public User getUserWithRetry(Long id) {
 // resilience4j.circuitbreaker.instances.userService:
 //   sliding-window-size: 10
 //   failure-rate-threshold: 50
-//   wait-duration-in-open-state: 5s`
+//   wait-duration-in-open-state: 5s`,
       },
       {
         title: "API Gateway",
@@ -2685,7 +3414,7 @@ public User getUserWithRetry(Long id) {
           "Single entry point for all client requests",
           "Routes requests to appropriate microservices",
           "Handles cross-cutting concerns: auth, rate limiting, logging",
-          "Spring Cloud Gateway is the recommended implementation"
+          "Spring Cloud Gateway is the recommended implementation",
         ],
         interview: `"An API Gateway acts as the single entry point for all client requests and routes them to appropriate microservices. It handles authentication, rate limiting, and request aggregation."`,
         code: `@SpringBootApplication
@@ -2708,7 +3437,7 @@ public class GatewayApplication {
 
 // Client → Gateway (port 8080)
 //   /api/users/1   → routed to user-service
-//   /api/orders/5  → routed to order-service`
+//   /api/orders/5  → routed to order-service`,
       },
       {
         title: "Message Queues",
@@ -2717,7 +3446,7 @@ public class GatewayApplication {
           "Enable asynchronous communication between microservices",
           "Loose coupling — sender doesn't wait for receiver",
           "Improved scalability and resilience",
-          "Common implementations: Kafka, RabbitMQ"
+          "Common implementations: Kafka, RabbitMQ",
         ],
         interview: `"Message queues enable asynchronous communication between microservices. Instead of directly calling another service, a service sends a message to a queue which is processed by another service independently."`,
         code: `// Synchronous (tight coupling)
@@ -2731,7 +3460,7 @@ public class GatewayApplication {
 // 1. Order Service doesn't wait for Payment Service
 // 2. If Payment Service is down, message stays in queue
 // 3. Multiple consumers can process in parallel
-// 4. Easy to add new consumers without changing producer`
+// 4. Easy to add new consumers without changing producer`,
       },
       {
         title: "Apache Kafka",
@@ -2740,7 +3469,7 @@ public class GatewayApplication {
           "Distributed event streaming platform",
           "High-throughput, fault-tolerant messaging",
           "Key concepts: Producer, Consumer, Topic, Broker",
-          "Used for event-driven architectures and real-time pipelines"
+          "Used for event-driven architectures and real-time pipelines",
         ],
         interview: `"Apache Kafka is a distributed event streaming platform used for high-throughput, fault-tolerant messaging between services. Producers publish events to topics, and multiple consumers can independently read from those topics."`,
         code: `// Kafka Producer
@@ -2764,7 +3493,7 @@ public class InventoryConsumer {
 }
 
 // Flow: Order Service → Topic "orders" → Inventory Service
-//                                       → Notification Service`
+//                                       → Notification Service`,
       },
       {
         title: "RabbitMQ",
@@ -2773,7 +3502,7 @@ public class InventoryConsumer {
           "Message broker for reliable service communication",
           "Key concepts: Producer, Queue, Consumer, Exchange",
           "Exchange routes messages to appropriate queues",
-          "Supports multiple routing strategies (direct, topic, fanout)"
+          "Supports multiple routing strategies (direct, topic, fanout)",
         ],
         interview: `"RabbitMQ is a message broker that enables reliable communication between services using queues and message routing. Producers send messages to an exchange which routes them to the appropriate queue."`,
         code: `// RabbitMQ Producer
@@ -2798,7 +3527,7 @@ public class NotificationConsumer {
     }
 }
 
-// Flow: Producer → Exchange → Queue → Consumer`
+// Flow: Producer → Exchange → Queue → Consumer`,
       },
       {
         title: "Event-Driven Architecture",
@@ -2807,7 +3536,7 @@ public class NotificationConsumer {
           "Services communicate by publishing and subscribing to events",
           "No direct synchronous API calls between services",
           "Enables loose coupling and independent scaling",
-          "Works with Kafka, RabbitMQ, or other message brokers"
+          "Works with Kafka, RabbitMQ, or other message brokers",
         ],
         interview: `"Event-driven architecture is a design pattern where services communicate by publishing and subscribing to events instead of direct synchronous API calls. Multiple services can react to the same event independently."`,
         code: `// Event-driven flow:
@@ -2832,7 +3561,7 @@ public class OrderService {
 @EventListener
 public void onOrderCreated(OrderCreatedEvent event) {
     inventoryService.updateStock(event.getOrder());
-}`
+}`,
       },
       {
         title: "Distributed Tracing",
@@ -2841,7 +3570,7 @@ public void onOrderCreated(OrderCreatedEvent event) {
           "Tracks requests across multiple microservices",
           "Assigns unique trace IDs to each request flow",
           "Helps debug performance issues in distributed systems",
-          "Common tools: Zipkin, Jaeger, Spring Cloud Sleuth"
+          "Common tools: Zipkin, Jaeger, Spring Cloud Sleuth",
         ],
         interview: `"Distributed tracing tracks a request as it flows through multiple microservices. It assigns a unique trace ID so developers can follow the entire request path and identify bottlenecks."`,
         code: `// Without tracing:
@@ -2860,7 +3589,7 @@ spring.sleuth.sampler.probability=1.0
 spring.zipkin.base-url=http://localhost:9411
 
 // Each log includes trace ID:
-// [order-service, abc-123, span-456] Processing order...`
+// [order-service, abc-123, span-456] Processing order...`,
       },
       {
         title: "Saga Pattern",
@@ -2869,7 +3598,7 @@ spring.zipkin.base-url=http://localhost:9411
           "Manages distributed transactions across microservices",
           "Sequence of local transactions with compensating actions",
           "Two types: Choreography (event-based) and Orchestration (coordinator)",
-          "Compensating transaction = rollback action"
+          "Compensating transaction = rollback action",
         ],
         interview: `"Saga Pattern manages distributed transactions across microservices using a sequence of local transactions with compensating actions. If any step fails, previous steps are rolled back."`,
         code: `// Distributed transaction problem:
@@ -2894,7 +3623,7 @@ public class OrderSagaOrchestrator {
             orderService.cancelOrder(order);  // compensate
         }
     }
-}`
+}`,
       },
       {
         title: "Load Balancing",
@@ -2903,7 +3632,7 @@ public class OrderSagaOrchestrator {
           "Distributes requests across multiple service instances",
           "Improves availability and performance",
           "Client-side: Spring Cloud LoadBalancer",
-          "Server-side: Nginx, HAProxy, cloud load balancers"
+          "Server-side: Nginx, HAProxy, cloud load balancers",
         ],
         interview: `"Load balancing distributes incoming requests across multiple instances of a service to improve availability and performance. Spring Cloud LoadBalancer provides client-side load balancing with Eureka."`,
         code: `// Without load balancing:
@@ -2925,37 +3654,528 @@ public RestTemplate restTemplate() {
 restTemplate.getForObject(
     "http://user-service/users/1", User.class
 );
-// Eureka returns multiple instances, LoadBalancer picks one`
-      }
+// Eureka returns multiple instances, LoadBalancer picks one`,
+      },
     ],
     trapQuestions: [
-      { question: "Microservices vs Monolith — which is always better?", answer: "Neither. Monolith is simpler for small teams and early-stage products. Microservices add complexity (networking, distributed transactions, deployment). Choose based on scale and team size." },
-      { question: "Can microservices share a database?", answer: "Anti-pattern. Each service should own its data. Shared DB creates tight coupling. Use APIs or events to share data between services." },
-      { question: "What happens if Eureka Server goes down?", answer: "Services use cached registry. They can still communicate using last known addresses. But new services can't register until Eureka is back." },
-      { question: "Kafka vs RabbitMQ — when to use which?", answer: "Kafka for high-throughput event streaming and log aggregation. RabbitMQ for traditional message queuing with complex routing. Kafka retains messages, RabbitMQ deletes after consumption." }
-    ]
+      {
+        question: "Microservices vs Monolith — which is always better?",
+        answer:
+          "Neither. Monolith is simpler for small teams and early-stage products. Microservices add complexity (networking, distributed transactions, deployment). Choose based on scale and team size.",
+      },
+      {
+        question: "Can microservices share a database?",
+        answer:
+          "Anti-pattern. Each service should own its data. Shared DB creates tight coupling. Use APIs or events to share data between services.",
+      },
+      {
+        question: "What happens if Eureka Server goes down?",
+        answer:
+          "Services use cached registry. They can still communicate using last known addresses. But new services can't register until Eureka is back.",
+      },
+      {
+        question: "Kafka vs RabbitMQ — when to use which?",
+        answer:
+          "Kafka for high-throughput event streaming and log aggregation. RabbitMQ for traditional message queuing with complex routing. Kafka retains messages, RabbitMQ deletes after consumption.",
+      },
+    ],
+  },
+  {
+    id: "spring-security",
+    label: "Spring Security Deep Dive",
+    icon: "🛡️",
+    colorClass: "topic-spring",
+    sections: [
+      {
+        title: "Authentication vs Authorization",
+        tag: "Core Concepts",
+        keyPoints: [
+          "Authentication = who you are (identity proof)",
+          "Authorization = what you can access (permissions/roles)",
+          "Authentication usually runs first, authorization runs after",
+          "Both depend on SecurityContext set for the current request",
+        ],
+        interview: `"Authentication answers 'Who are you?' and Authorization answers 'What can you do?'. Example: login with username/password (authentication), then checking role ADMIN for /admin endpoint (authorization). In Spring Security, this context lives in SecurityContext and is reused during the request."`,
+        code: `// Authentication object after successful login
+Authentication auth = new UsernamePasswordAuthenticationToken(
+    userDetails,
+    null,
+    userDetails.getAuthorities() // ROLE_USER, ROLE_ADMIN, etc.
+);
+
+SecurityContextHolder.getContext().setAuthentication(auth);
+
+// Authorization examples
+@PreAuthorize("hasRole('ADMIN')")
+public void deleteUser(Long id) { }
+
+@PreAuthorize("hasAuthority('ORDER_READ')")
+public List<Order> getOrders() { return List.of(); }`,
+      },
+      {
+        title: "Request Flow: FilterChain → AuthenticationManager",
+        tag: "Pipeline",
+        keyPoints: [
+          "Every request first enters SecurityFilterChain",
+          "Authentication filter extracts credentials/token",
+          "Filter creates Authentication and delegates to AuthenticationManager",
+          "Manager delegates to provider(s) and returns authenticated token",
+        ],
+        interview: `"Think of Spring Security as an airport security line. Request enters SecurityFilterChain. A specific filter (like UsernamePasswordAuthenticationFilter or a JWT filter) extracts credentials and builds an Authentication token. That token is sent to AuthenticationManager, which asks providers to verify it. If valid, authenticated user is saved into SecurityContext; then authorization checks are applied."`,
+        code: `Client Request
+   -> DelegatingFilterProxy
+   -> FilterChainProxy
+   -> SecurityFilterChain (ordered filters)
+        -> UsernamePasswordAuthenticationFilter (form login)
+           OR JwtAuthenticationFilter (token login)
+        -> AuthenticationManager.authenticate(authentication)
+        -> ProviderManager
+           -> DaoAuthenticationProvider / JwtAuthProvider / others
+        -> SecurityContextHolder.setAuthentication(authenticated)
+        -> AuthorizationFilter checks access rules
+   -> Controller method
+
+// If auth fails -> AuthenticationEntryPoint (401)
+// If access denied -> AccessDeniedHandler (403)`,
+      },
+      {
+        title: "Inside AuthenticationManager & ProviderManager",
+        tag: "Internal Delegation",
+        keyPoints: [
+          "AuthenticationManager is an interface, ProviderManager is default implementation",
+          "ProviderManager loops providers in order and picks the first that can authenticate",
+          "Each AuthenticationProvider declares supported token type via supports(...)",
+          "DaoAuthenticationProvider uses UserDetailsService + PasswordEncoder",
+          "Can delegate to parent AuthenticationManager when local providers cannot authenticate",
+        ],
+        interview: `"ProviderManager is a chain-of-responsibility implementation. Step 1: it receives an unauthenticated token. Step 2: it iterates providers in configured order. Step 3: each provider is asked supports(tokenClass). Step 4: first supporting provider tries authenticate(). If success, authenticated token is returned with authorities and credentials usually erased. If provider throws AuthenticationException, the chain may continue or fail based on exception type. If no provider supports it, ProviderNotFoundException is thrown. A parent AuthenticationManager can be configured as fallback for multi-module setups."`,
+        code: `@Bean
+AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+        throws Exception {
+    return config.getAuthenticationManager();
+}
+
+@Bean
+UserDetailsService userDetailsService(UserRepository repo) {
+    return username -> repo.findByEmail(username)
+        .map(user -> new org.springframework.security.core.userdetails.User(
+            user.getEmail(),
+            user.getPassword(),
+            List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        ))
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+}
+
+@Bean
+PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+
+// Conceptual flow inside ProviderManager
+Authentication authenticate(Authentication request) {
+  for (AuthenticationProvider provider : providers) {
+    if (!provider.supports(request.getClass())) continue;
+    Authentication result = provider.authenticate(request);
+    if (result != null) {
+      eraseCredentialsIfNeeded(result);
+      publishSuccessEvent(result);
+      return result;
+    }
   }
+  if (parentManager != null) return parentManager.authenticate(request);
+  throw new ProviderNotFoundException("No provider for token");
+}
+
+// Common providers you should know:
+// DaoAuthenticationProvider        -> username/password + UserDetailsService
+// JwtAuthenticationProvider(custom)-> JWT validation
+// AnonymousAuthenticationProvider  -> anonymous auth token support
+// RememberMeAuthenticationProvider -> remember-me token`,
+      },
+      {
+        title: "AuthenticationProvider Deep Dive",
+        tag: "Provider Internals",
+        keyPoints: [
+          "AuthenticationProvider has 2 methods: supports(...) and authenticate(...)",
+          "supports(...) only declares compatibility; authenticate(...) does real verification",
+          "Successful provider returns authenticated token with GrantedAuthority list",
+          "Custom providers are best for OTP, API key, SSO assertions, and custom JWT rules",
+        ],
+        interview: `"AuthenticationProvider is the strategy that performs real credential verification. ProviderManager only orchestrates. In DaoAuthenticationProvider, authenticate() loads user using UserDetailsService, checks account state (locked/disabled/expired), compares password with PasswordEncoder.matches(), and then returns authenticated UsernamePasswordAuthenticationToken with roles."`,
+        code: `public class ApiKeyAuthenticationToken extends AbstractAuthenticationToken {
+  private final String apiKey;
+  private final Object principal;
+
+  public ApiKeyAuthenticationToken(String apiKey) {
+    super(null);
+    this.apiKey = apiKey;
+    this.principal = null;
+    setAuthenticated(false);
+  }
+
+  public ApiKeyAuthenticationToken(Object principal,
+                   Collection<? extends GrantedAuthority> auths) {
+    super(auths);
+    this.apiKey = null;
+    this.principal = principal;
+    setAuthenticated(true);
+  }
+
+  @Override public Object getCredentials() { return apiKey; }
+  @Override public Object getPrincipal() { return principal; }
+}
+
+@Component
+public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
+  @Override
+  public boolean supports(Class<?> authType) {
+    return ApiKeyAuthenticationToken.class.isAssignableFrom(authType);
+  }
+
+  @Override
+  public Authentication authenticate(Authentication auth) {
+    String apiKey = (String) auth.getCredentials();
+    if (!"secret-key-123".equals(apiKey)) {
+      throw new BadCredentialsException("Invalid API key");
+    }
+    return new ApiKeyAuthenticationToken(
+      "service-client",
+      List.of(new SimpleGrantedAuthority("ROLE_SERVICE"))
+    );
+  }
+}`,
+      },
+      {
+        title: "Username/Password Login: Exact Runtime Steps",
+        tag: "Execution Trace",
+        keyPoints: [
+          "Client submits credentials (JSON/form)",
+          "Authentication filter builds unauthenticated token",
+          "AuthenticationManager authenticates and returns authorities",
+          "SecurityContext is set, then success handler/response is sent",
+        ],
+        interview: `"Runtime sequence: request hits login endpoint, filter reads username/password, creates UsernamePasswordAuthenticationToken (unauthenticated), delegates to manager, provider validates credentials, returns authenticated token with roles, then SecurityContext is updated. After that, downstream authorization sees user as logged in."`,
+        code: `// Pseudo-flow inside authentication filter
+String username = request.getParameter("username");
+String password = request.getParameter("password");
+
+Authentication input =
+    new UsernamePasswordAuthenticationToken(username, password);
+
+Authentication output = authenticationManager.authenticate(input);
+
+SecurityContextHolder.getContext().setAuthentication(output);
+
+// output.isAuthenticated() == true
+// output.getAuthorities() contains roles/permissions`,
+      },
+      {
+        title: "Authorization Phase: URL and Method Security",
+        tag: "Access Control",
+        keyPoints: [
+          "URL rules are checked in filter chain first",
+          "Method-level checks happen with @PreAuthorize/@PostAuthorize",
+          "Authorities are evaluated from Authentication object",
+          "Unauthorized = 401, forbidden = 403",
+        ],
+        interview: `"Authorization has two layers. First, request-level rules in HttpSecurity (like /admin/** requires ADMIN). Second, method-level rules using @PreAuthorize for business-layer protection. 401 means not authenticated; 403 means authenticated but lacking permission."`,
+        code: `@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+}
+
+@PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+public void approveRefund(Long orderId) { }`,
+      },
+      {
+        title: "JWT Flow in Stateless APIs",
+        tag: "Production Pattern",
+        keyPoints: [
+          "Login endpoint authenticates once and returns JWT",
+          "Subsequent requests carry Bearer token",
+          "Custom JWT filter validates token before UsernamePasswordAuthenticationFilter",
+          "SessionCreationPolicy.STATELESS avoids server-side session storage",
+        ],
+        interview: `"For REST APIs, common flow is stateless JWT. User logs in once, gets token, then sends it in Authorization header for each request. JWT filter validates token, loads user authorities, and sets SecurityContext. No HttpSession is created on server."`,
+        code: `@Bean
+SecurityFilterChain filterChain(HttpSecurity http,
+                                JwtAuthenticationFilter jwtFilter) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**").permitAll()
+            .anyRequest().authenticated())
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+}
+
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                    HttpServletResponse res,
+                                    FilterChain chain)
+            throws ServletException, IOException {
+        String header = req.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            // validate token, load user, set SecurityContext...
+        }
+        chain.doFilter(req, res);
+    }
+}`,
+      },
+      {
+        title: "OAuth2 Grant Types (What to Use Today)",
+        tag: "OAuth2",
+        keyPoints: [
+          "Authorization Code + PKCE is recommended for web/mobile/public clients",
+          "Client Credentials is for service-to-service (no end-user)",
+          "Refresh Token renews access tokens without forcing user re-login",
+          "Resource Owner Password grant is legacy/deprecated and should be avoided",
+        ],
+        interview: `"Grant type means how a client gets an access token. For user-facing apps, use Authorization Code with PKCE. For machine-to-machine calls, use Client Credentials. Use Refresh Token to obtain new short-lived access tokens safely. Avoid password grant in modern systems because it forces clients to handle user passwords directly."`,
+        code: `// 1) Authorization Code + PKCE (recommended)
+// Browser/mobile -> Authorization Server /authorize
+// User logs in + consents
+// App gets authorization_code
+// App exchanges code + code_verifier at /token -> access_token (+ refresh_token)
+
+// 2) Client Credentials (service-to-service)
+// service A sends client_id + client_secret to /token
+// receives access_token representing the client app (not a user)
+
+// 3) Refresh Token
+// client sends refresh_token to /token
+// receives new access_token (and possibly rotated refresh_token)
+
+// 4) Device Code (for TV/CLI without browser)
+// device gets user_code + verification_uri
+// user authorizes on another device
+// device polls /token until authorized
+
+// Legacy/avoid:
+// Resource Owner Password Credentials (password grant)
+// Implicit grant (replaced by auth code + PKCE)
+
+// Spring note:
+// Spring Authorization Server supports modern OAuth2/OIDC flows.
+// Spring Security Resource Server validates access tokens on APIs.`,
+      },
+      {
+        title: "Session vs JWT vs OAuth2 (Quick Comparison)",
+        tag: "Interview Table",
+        keyPoints: [
+          "Session = server-side login state (cookie holds session id), best for traditional MVC apps",
+          "JWT = self-contained signed token, great for stateless APIs and microservices",
+          "OAuth2 = authorization/delegation protocol, not a token format by itself",
+          "OIDC (on top of OAuth2) adds identity/login; OAuth2 alone focuses on API authorization",
+          "Revocation differs: session can be killed centrally; JWT usually needs short expiry + refresh rotation + blocklist",
+          "Common real-world combo: OAuth2/OIDC login + JWT access token + refresh token",
+        ],
+        interview: `"These three are often confused because they appear together, but they solve different layers. Session and JWT are ways to carry authenticated state. OAuth2 is a delegation protocol for obtaining access to protected resources. If the interviewer asks 'which one is better?', answer: it depends on architecture. Session is simplest for monoliths and strict central logout. JWT scales better for distributed stateless APIs. OAuth2/OIDC is needed when you have SSO, social login, or third-party delegated access."`,
+        code: `| Approach | What It Is | How It Works | State Location | Strength | Trade-off |
+|---|---|---|---|---|---|
+| Session | Server-managed auth state | User logs in -> server creates session -> browser sends session cookie each request | Server (memory/Redis/DB), cookie stores session id only | Easy logout/revocation, simple security model | Horizontal scaling needs shared session store or sticky sessions |
+| JWT | Signed token with claims | User logs in -> server issues JWT -> client sends Bearer token -> API verifies signature | Mostly client-side token; server keeps minimal state | Stateless, API-friendly, microservice-ready | Token revocation and immediate logout are harder |
+| OAuth2 | Delegated authorization framework | Client obtains access token from Authorization Server using a grant flow | Depends on implementation (often JWT access token) | Standard for SSO and third-party API delegation | More complexity (clients, scopes, consent, token lifecycle) |
+
+// OIDC note:
+// If your goal is "user login/identity", use OpenID Connect (OIDC) on top of OAuth2.
+
+// Revocation strategy:
+// Session: invalidate session id on server -> immediate logout.
+// JWT: short-lived access token (5-15 min) + refresh token rotation + token blacklist for critical revokes.
+
+// Decision cheat-sheet:
+// 1) Server-rendered app + same backend + simple ops -> Session.
+// 2) Mobile + SPA + API gateway + microservices -> JWT-based access tokens.
+// 3) SSO, Google/Microsoft login, partner API delegation -> OAuth2/OIDC (Auth Code + PKCE).
+
+// Spring Security mapping:
+// Session: stateful config + formLogin()/oauth2Login().
+// JWT API: SessionCreationPolicy.STATELESS + resource server/JWT filter.
+// OAuth2/OIDC: spring-security-oauth2-client / Spring Authorization Server.`,
+      },
+      {
+        title: "Failure Handling, SecurityContext, and Thread Flow",
+        tag: "Advanced",
+        keyPoints: [
+          "AuthenticationException -> AuthenticationEntryPoint (usually 401)",
+          "AccessDeniedException -> AccessDeniedHandler (usually 403)",
+          "SecurityContextHolder is thread-local by default",
+          "Context must be propagated explicitly in async executors",
+        ],
+        interview: `"Two common failure paths: unauthenticated request triggers AuthenticationEntryPoint (401), insufficient privileges triggers AccessDeniedHandler (403). SecurityContext is thread-bound (ThreadLocal), so when using @Async or custom executors you must propagate context to child threads if needed."`,
+        code: `@Bean
+SecurityFilterChain chain(HttpSecurity http) throws Exception {
+    http.exceptionHandling(ex -> ex
+        .authenticationEntryPoint((req, res, e) -> {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("Unauthorized");
+        })
+        .accessDeniedHandler((req, res, e) -> {
+            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            res.getWriter().write("Forbidden");
+        })
+    );
+    return http.build();
+}
+
+Authentication auth = SecurityContextHolder
+    .getContext()
+    .getAuthentication();`,
+      },
+    ],
+    trapQuestions: [
+      {
+        question:
+          "Does Spring Security call AuthenticationManager for every request in JWT mode?",
+        answer:
+          "Not always. Many JWT filters validate token directly and set SecurityContext. AuthenticationManager is typically used at login (username/password exchange).",
+      },
+      {
+        question: "401 vs 403 in one line?",
+        answer:
+          "401 = not authenticated (or invalid token). 403 = authenticated but not authorized for this resource.",
+      },
+      {
+        question:
+          "Why is PasswordEncoder mandatory with DaoAuthenticationProvider?",
+        answer:
+          "Because stored passwords must be hashed (BCrypt/Argon2). Provider compares raw input against hashed value via PasswordEncoder.matches().",
+      },
+      {
+        question: "FilterSecurityInterceptor vs AuthorizationFilter?",
+        answer:
+          "Both are authorization-related in different versions/styles. In modern Spring Security, AuthorizationFilter + AuthorizationManager is the common model.",
+      },
+      {
+        question: "Which grant type should I choose by default for user login?",
+        answer:
+          "Authorization Code with PKCE. It is the modern secure default for browser, SPA, and mobile apps.",
+      },
+      {
+        question: "Client Credentials vs Authorization Code in one line?",
+        answer:
+          "Client Credentials = app-to-app identity, no user. Authorization Code = user-delegated access with consent.",
+      },
+    ],
+  },
 ];
 
 export const cheatSheetItems = [
-  { term: "Overloading", def: "Same class, same name, different params", colorClass: "topic-oop" },
-  { term: "Overriding", def: "Parent-child, same sig, @Override", colorClass: "topic-interface" },
-  { term: "Composition", def: "Strong HAS-A, child dies with parent", colorClass: "topic-oop" },
-  { term: "Aggregation", def: "Weak HAS-A, child lives independently", colorClass: "topic-strings" },
-  { term: "Abstract class", def: "Partial impl, can have fields", colorClass: "topic-solid" },
-  { term: "Interface", def: "Contract only, multiple impl", colorClass: "topic-patterns" },
-  { term: "Singleton", def: "Bill Pugh static inner class", colorClass: "topic-annotations" },
-  { term: "String Pool", def: "Literals shared, new() bypasses it", colorClass: "topic-strings" },
-  { term: "StringBuilder", def: "Mutable, fast, not thread-safe", colorClass: "topic-spring" },
-  { term: "@Transactional", def: "Self-invocation = proxy bypassed!", colorClass: "topic-solid" },
-  { term: "Circuit Breaker", def: "Fail fast + fallback = resilience", colorClass: "topic-micro" },
-  { term: "AOP @Around", def: "Wraps entire method — most powerful", colorClass: "topic-patterns" },
-  { term: "HashMap", def: "O(1) avg, hashCode + equals", colorClass: "topic-ds" },
-  { term: "BST Inorder", def: "Left→Root→Right = sorted output", colorClass: "topic-ds" },
-  { term: "ACID", def: "Atomic, Consistent, Isolated, Durable", colorClass: "topic-db" },
-  { term: "LEFT JOIN", def: "All left rows + matching right", colorClass: "topic-db" },
-  { term: "Eureka", def: "Service registry for discovery", colorClass: "topic-micro" },
-  { term: "API Gateway", def: "Single entry point, routes requests", colorClass: "topic-micro" },
-  { term: "Saga Pattern", def: "Distributed tx with compensations", colorClass: "topic-micro" },
-  { term: "Kafka", def: "High-throughput event streaming", colorClass: "topic-micro" },
+  {
+    term: "Overloading",
+    def: "Same class, same name, different params",
+    colorClass: "topic-oop",
+  },
+  {
+    term: "Overriding",
+    def: "Parent-child, same sig, @Override",
+    colorClass: "topic-interface",
+  },
+  {
+    term: "Composition",
+    def: "Strong HAS-A, child dies with parent",
+    colorClass: "topic-oop",
+  },
+  {
+    term: "Aggregation",
+    def: "Weak HAS-A, child lives independently",
+    colorClass: "topic-strings",
+  },
+  {
+    term: "Abstract class",
+    def: "Partial impl, can have fields",
+    colorClass: "topic-solid",
+  },
+  {
+    term: "Interface",
+    def: "Contract only, multiple impl",
+    colorClass: "topic-patterns",
+  },
+  {
+    term: "Singleton",
+    def: "Bill Pugh static inner class",
+    colorClass: "topic-annotations",
+  },
+  {
+    term: "String Pool",
+    def: "Literals shared, new() bypasses it",
+    colorClass: "topic-strings",
+  },
+  {
+    term: "StringBuilder",
+    def: "Mutable, fast, not thread-safe",
+    colorClass: "topic-spring",
+  },
+  {
+    term: "@Transactional",
+    def: "Self-invocation = proxy bypassed!",
+    colorClass: "topic-solid",
+  },
+  {
+    term: "Circuit Breaker",
+    def: "Fail fast + fallback = resilience",
+    colorClass: "topic-micro",
+  },
+  {
+    term: "AOP @Around",
+    def: "Wraps entire method — most powerful",
+    colorClass: "topic-patterns",
+  },
+  {
+    term: "HashMap",
+    def: "O(1) avg, hashCode + equals",
+    colorClass: "topic-ds",
+  },
+  {
+    term: "BST Inorder",
+    def: "Left→Root→Right = sorted output",
+    colorClass: "topic-ds",
+  },
+  {
+    term: "ACID",
+    def: "Atomic, Consistent, Isolated, Durable",
+    colorClass: "topic-db",
+  },
+  {
+    term: "LEFT JOIN",
+    def: "All left rows + matching right",
+    colorClass: "topic-db",
+  },
+  {
+    term: "Eureka",
+    def: "Service registry for discovery",
+    colorClass: "topic-micro",
+  },
+  {
+    term: "API Gateway",
+    def: "Single entry point, routes requests",
+    colorClass: "topic-micro",
+  },
+  {
+    term: "Saga Pattern",
+    def: "Distributed tx with compensations",
+    colorClass: "topic-micro",
+  },
+  {
+    term: "Kafka",
+    def: "High-throughput event streaming",
+    colorClass: "topic-micro",
+  },
 ];

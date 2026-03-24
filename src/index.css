@@ -1,8 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
@@ -60,7 +60,7 @@
     --toc-bg: 0 0% 100%;
     --toc-border: 220 13% 91%;
     --toc-active: 220 70% 50%;
-    
+
     --interview-bg: 220 60% 97%;
     --interview-border: 220 70% 50%;
   }
@@ -108,7 +108,7 @@
     --toc-bg: 224 55% 5%;
     --toc-border: 215 28% 16%;
     --toc-active: 217 91% 60%;
-    
+
     --interview-bg: 217 50% 8%;
     --interview-border: 217 91% 60%;
   }
@@ -120,7 +120,11 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
   }
 }
 
