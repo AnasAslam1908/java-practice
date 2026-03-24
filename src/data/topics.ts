@@ -864,6 +864,32 @@ names.stream()
     colorClass: "topic-solid",
     sections: [
       {
+        title: "What is SOLID Principle?",
+        tag: "Core Definition",
+        keyPoints: [
+          "SOLID is a set of 5 object-oriented design principles",
+          "S = Single Responsibility",
+          "O = Open/Closed",
+          "L = Liskov Substitution",
+          "I = Interface Segregation",
+          "D = Dependency Inversion",
+          "Helps build maintainable, scalable, and testable software",
+        ],
+        interview: `"SOLID is a collection of five design principles used in object-oriented programming to write clean, flexible, and maintainable code. S is Single Responsibility, O is Open/Closed, L is Liskov Substitution, I is Interface Segregation, and D is Dependency Inversion. Together, they reduce coupling, improve readability, and make systems easier to test and extend."`,
+        code: `// SOLID at a glance
+// S - Single Responsibility      -> One class, one reason to change
+// O - Open/Closed                -> Open for extension, closed for modification
+// L - Liskov Substitution        -> Child should safely replace parent
+// I - Interface Segregation      -> Prefer small, focused interfaces
+// D - Dependency Inversion       -> Depend on abstractions, not concrete classes
+
+// Why SOLID?
+// - Better maintainability
+// - Easier testing
+// - Lower coupling
+// - Cleaner architecture`,
+      },
+      {
         title: "S — Single Responsibility",
         tag: "One Job",
         keyPoints: [
