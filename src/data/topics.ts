@@ -1150,6 +1150,43 @@ class Node {
 // LinkedList -> dynamic size, frequent insert/delete`,
       },
       {
+        title: "What Is Stack Frame?",
+        tag: "Must Know",
+        keyPoints: [
+          "A stack frame is memory created for each method call",
+          "It stores local variables, method parameters, and return address",
+          "Each recursive call creates a new frame on top of the stack",
+          "Frames are removed automatically when method returns",
+          "Too many frames can cause StackOverflowError",
+        ],
+        interview: `"A stack frame is a per-method memory block in the call stack. Whenever a method is invoked, JVM pushes a new frame containing parameters, local variables, and control info. When method completes, that frame is popped. In recursion, many frames are created quickly, which is why deep recursion can cause StackOverflowError."`,
+        code: `// Call chain example
+void a() {
+    int x = 10;
+    b(x);
+}
+
+void b(int n) {
+    int y = n + 5;
+    c(y);
+}
+
+void c(int value) {
+    System.out.println(value);
+}
+
+// Stack (top to bottom while c() runs):
+// [c frame: value]
+// [b frame: n, y]
+// [a frame: x]
+
+// Recursion creates many frames
+int fact(int n) {
+    if (n == 1) return 1;
+    return n * fact(n - 1); // new frame each call
+}`,
+      },
+      {
         title: "For Loop vs Recursion",
         tag: "Interview Style",
         keyPoints: [
