@@ -12,3 +12,4 @@
 - Databases
 - Microservices & Spring Cloud
 - Spring Security Deep Dive
+- Spring AI

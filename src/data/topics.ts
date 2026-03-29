@@ -1286,6 +1286,38 @@ class SalaryBox {
     }
 }`,
       },
+      {
+        title: "Stateful vs Stateless (and JWT)",
+        tag: "Interview Style",
+        keyPoints: [
+          "Stateful systems store client session data on the server",
+          "Stateless systems keep no client session between requests",
+          "In stateless APIs, each request must carry all auth context",
+          "JWT is stateless because token contains claims and is self-validated",
+          "Logout/revocation needs extra strategy (blacklist, short expiry, rotation)",
+        ],
+        interview: `"Stateful means server remembers client session (usually via HttpSession/cookie-backed session id). Stateless means server does not store per-client session; every request is independent and carries required auth data. JWT is considered stateless because token itself carries user identity/claims and server validates signature on each request without reading session state from server memory."`,
+        code: `// Stateful flow (session-based)
+POST /login -> server creates session in memory/redis
+Set-Cookie: JSESSIONID=abc123
+
+GET /orders -> browser sends JSESSIONID
+Server loads user session from store
+
+// Stateless flow (JWT-based)
+POST /login -> server returns JWT
+Authorization: Bearer eyJhbGciOi...
+
+GET /orders -> client sends JWT each time
+Server verifies signature + expiry, extracts claims
+No server-side session lookup required
+
+// Spring Security config for stateless JWT APIs
+http
+  .csrf(csrf -> csrf.disable())
+  .sessionManagement(session ->
+      session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));`,
+      },
     ],
   },
   {
@@ -4098,6 +4130,236 @@ Authentication auth = SecurityContextHolder
         question: "Client Credentials vs Authorization Code in one line?",
         answer:
           "Client Credentials = app-to-app identity, no user. Authorization Code = user-delegated access with consent.",
+      },
+    ],
+  },
+  {
+    id: "spring-ai",
+    label: "Spring AI",
+    icon: "🤖",
+    colorClass: "topic-spring",
+    sections: [
+      {
+        title: "What Is Spring AI?",
+        tag: "Foundation",
+        keyPoints: [
+          "Spring AI provides abstractions for integrating LLMs in Spring apps",
+          "Supports providers like OpenAI, Azure OpenAI, Anthropic, Ollama, and more",
+          "Unifies chat, embedding, image, and moderation style APIs",
+          "Lets you switch providers with minimal code changes",
+        ],
+        interview: `"Spring AI is a Spring ecosystem project that gives standard interfaces for LLM features such as chat completion and embeddings. It reduces provider-specific boilerplate and makes it easy to switch models while keeping Spring Boot style configuration and dependency injection."`,
+        code: `// Why Spring AI?
+// Without it: provider-specific SDK code everywhere
+// With it: common abstractions + Spring configuration
+
+// Typical building blocks:
+// - ChatClient / ChatModel
+// - EmbeddingModel
+// - VectorStore
+// - Advisors (memory, RAG, etc.)`,
+      },
+      {
+        title: "Definitions: LLM, Model, Agent, Tool, Task",
+        tag: "Must Know",
+        keyPoints: [
+          "LLM: a large language model trained on massive text to generate/understand language",
+          "Model: a specific deployed variant (for example GPT-4o-mini, Claude Sonnet, Llama 3)",
+          "Agent: an orchestration layer that plans steps and can call tools to complete goals",
+          "Tool: an external function/system the model can invoke for real actions or data",
+          "Task: a concrete objective given to model/agent, usually with constraints and expected output",
+        ],
+        interview: `"LLM is the broad AI capability, Model is the exact version you call in production, Agent is the decision-making workflow built around the model, Tool is a callable integration (API/DB/function), and Task is the specific job to complete. In simple words: model thinks, agent coordinates, tools act, task defines the goal."`,
+        code: `// Quick mental map
+// User Goal (Task)
+//   -> handled by Agent
+//        -> asks Model (LLM) for reasoning/next step
+//        -> optionally calls Tool(s) for real data/actions
+//        -> returns final answer/output
+
+// Example in an interview assistant:
+// Task: "Generate 10 Spring Boot interview questions"
+// Model: gpt-4o-mini
+// Agent: decides to first fetch user's level, then generate questions
+// Tool: questionTemplateService.getByLevel("intermediate")
+// Output: structured list of interview questions`,
+      },
+      {
+        title: "Setup & Dependencies",
+        tag: "Bootstrapping",
+        keyPoints: [
+          "Use Spring Boot starter for the provider you choose",
+          "Keep API keys in environment variables, never hardcode",
+          "Configure model name and base URL in application.properties/yml",
+          "Use profiles to separate local/dev/prod model configs",
+        ],
+        interview: `"Setup is straightforward: add the Spring AI starter for your provider, configure API key and model in properties, then inject ChatClient or model beans. Keep keys in env variables and use different profiles for local and production."`,
+        code: `<!-- pom.xml (example with OpenAI starter) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+
+// application.properties
+spring.ai.openai.api-key=
+spring.ai.openai.chat.options.model=gpt-4o-mini
+
+// Better: inject from env
+// spring.ai.openai.api-key=
+// ${OPENAI_API_KEY}`,
+      },
+      {
+        title: "ChatClient Basics",
+        tag: "Core API",
+        keyPoints: [
+          "ChatClient is the easiest way to call LLM chat from Spring",
+          "Use system/user prompts to control behavior",
+          "You can request typed output mapping to DTOs",
+          "Great for FAQ, summarization, and helper endpoints",
+        ],
+        interview: `"ChatClient provides a fluent API to send prompts and receive responses. In production, combine a strong system prompt, input validation, and timeouts/retries around model calls."`,
+        code: `@RestController
+@RequestMapping("/ai")
+public class AiController {
+
+    private final ChatClient chatClient;
+
+    public AiController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam String q) {
+        return chatClient.prompt()
+                .system("You are a concise Java interview assistant")
+                .user(q)
+                .call()
+                .content();
+    }
+}`,
+      },
+      {
+        title: "Prompt Templates & Variables",
+        tag: "Prompting",
+        keyPoints: [
+          "Use templates to avoid prompt duplication",
+          "Inject variables safely rather than string concat",
+          "Keep prompts short, explicit, and testable",
+          "Version prompts like code for reliable behavior",
+        ],
+        interview: `"Prompt templates improve maintainability. Instead of building giant strings at runtime, keep reusable templates with placeholders and pass validated variables. This gives predictable outputs and easier debugging."`,
+        code: `String template = """
+You are a senior Java mentor.
+Explain {topic} for {level} level in 5 bullet points.
+""";
+
+String response = chatClient.prompt()
+        .user(u -> u.text(template)
+                .param("topic", "ThreadLocal")
+                .param("level", "intermediate"))
+        .call()
+        .content();`,
+      },
+      {
+        title: "RAG with Vector Store",
+        tag: "Knowledge Grounding",
+        keyPoints: [
+          "RAG grounds answers in your own documents",
+          "Flow: ingest docs -> embed -> store vectors -> retrieve relevant chunks",
+          "Reduces hallucinations by adding source context",
+          "Use metadata filtering for tenant/domain isolation",
+        ],
+        interview: `"RAG is retrieval-augmented generation: first retrieve relevant context from a vector store, then send that context to the model in the prompt. This improves factual accuracy for domain-specific questions."`,
+        code: `// Conceptual RAG flow
+// 1) Ingest docs
+// 2) Convert chunks to embeddings
+// 3) Store in VectorStore
+// 4) Retrieve top-k chunks for user question
+// 5) Ask model with retrieved context
+
+String answer = chatClient.prompt()
+        .system("Answer only from provided context. If missing, say 'I don't know'.")
+        .user("Question: Explain optimistic locking")
+        .call()
+        .content();`,
+      },
+      {
+        title: "Tools / Function Calling",
+        tag: "Actions",
+        keyPoints: [
+          "Models can call application functions via tools",
+          "Use for weather, DB lookup, ticket status, internal APIs",
+          "Always validate tool inputs before execution",
+          "Log tool calls for audit and debugging",
+        ],
+        interview: `"Function calling allows the model to request deterministic operations from your backend. The model decides when a tool is needed, but your server executes and validates it securely."`,
+        code: `@Service
+public class UserLookupService {
+    public String getUserPlan(String email) {
+        // usually query DB or service
+        return "PREMIUM";
+    }
+}
+
+// Expose as callable tool in your AI flow and
+// return structured result to the model for final answer.`,
+      },
+      {
+        title: "Chat Memory",
+        tag: "Conversation",
+        keyPoints: [
+          "Memory keeps context across turns in a conversation",
+          "Use bounded memory to control token cost",
+          "Persist by conversation/session id",
+          "Do not store secrets or PII blindly in memory",
+        ],
+        interview: `"Without memory, each prompt is isolated. With chat memory, follow-up questions make sense because prior turns are included. In production, cap memory size and apply data retention policies."`,
+        code: `// Example pattern:
+// conversationId -> last N messages
+// before model call: attach memory window
+// after model call: append user + assistant messages
+
+// Keep memory bounded to avoid token explosion.`,
+      },
+      {
+        title: "Production Guardrails",
+        tag: "Best Practices",
+        keyPoints: [
+          "Add timeouts, retries, and circuit breakers around model calls",
+          "Use content filtering and output validation",
+          "Track prompt/response metrics, latency, token usage, and errors",
+          "Prefer fallback responses when provider is unavailable",
+        ],
+        interview: `"Treat LLM calls like external network dependencies. Add resilience patterns, sanitize inputs, validate outputs, and monitor token/latency costs. For critical flows, provide deterministic fallbacks."`,
+        code: `// Suggested reliability checklist:
+// 1) Timeout per model call
+// 2) Retry with backoff for transient failures
+// 3) Circuit breaker for provider outages
+// 4) Structured logging for prompt id, latency, token usage
+// 5) Fallback message when model call fails`,
+      },
+    ],
+    trapQuestions: [
+      {
+        question: "Is Spring AI itself an LLM provider?",
+        answer:
+          "No. Spring AI is an integration framework/abstraction layer. Providers are OpenAI, Azure OpenAI, Anthropic, Ollama, etc.",
+      },
+      {
+        question:
+          "Does using JWT or stateless APIs mean AI calls are stateless too?",
+        answer:
+          "Not necessarily. API auth can be stateless while chat memory is still persisted per conversation for context.",
+      },
+      {
+        question: "Can RAG eliminate hallucinations completely?",
+        answer:
+          "No. It reduces hallucinations by grounding context, but you still need prompt constraints and output validation.",
+      },
+      {
+        question: "Should API keys be stored in source code for quick setup?",
+        answer:
+          "Never. Use environment variables or secret managers and keep keys out of repo and logs.",
       },
     ],
   },
