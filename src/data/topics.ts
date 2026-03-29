@@ -4206,7 +4206,7 @@ spring.ai.openai.chat.options.model=gpt-4o-mini
 
 // Better: inject from env
 // spring.ai.openai.api-key=
-// ${OPENAI_API_KEY}`,
+// \${OPENAI_API_KEY}`,
       },
       {
         title: "ChatClient Basics",
