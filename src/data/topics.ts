@@ -4289,6 +4289,99 @@ Authentication auth = SecurityContextHolder
     .getContext()
     .getAuthentication();`,
       },
+      {
+        title: "CORS (Cross-Origin Resource Sharing)",
+        tag: "Web Security",
+        keyPoints: [
+          "CORS allows frontend on different domain to call backend API",
+          "Browser enforces same-origin policy by default — blocks cross-origin requests",
+          "CORS headers (Access-Control-Allow-Origin) tell browser to allow it",
+          "Configure allowed origins, methods, headers, and credentials in Spring Security",
+          "Use @CrossOrigin on controller or CorsConfigurer in SecurityFilterChain",
+        ],
+        interview: `"CORS is a browser security mechanism. By default, JavaScript on example.com can't call api.example.com because different domain. You explicitly allow it with CORS headers. In Spring Security, use CorsConfigurationSource to specify allowed origins, methods, and headers."`,
+        code: `// Option 1: @CrossOrigin annotation
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+public class UserController {
+    @GetMapping
+    public List<User> getUsers() { return userService.findAll(); }
+}
+
+// Option 2: Spring Security config (preferred)
+@Bean
+SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(cors -> cors.configurationSource(corsConfigSource()))
+        .csrf(csrf -> csrf.disable());
+    return http.build();
+}
+
+@Bean
+CorsConfigurationSource corsConfigSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://example.com"));
+    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+    config.setAllowedHeaders(Arrays.asList("*"));
+    config.setAllowCredentials(true);
+    config.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
+
+// Browser flow:
+// 1) OPTIONS preflight request to check if cross-origin allowed
+// 2) Server responds with Access-Control-Allow-Origin header
+// 3) Browser allows actual request (GET/POST/etc)`,
+      },
+      {
+        title: "CSRF Token (Cross-Site Request Forgery Protection)",
+        tag: "Web Security",
+        keyPoints: [
+          "CSRF token prevents forged requests from attacker's site",
+          "Token is unique per session and per request",
+          "Browser includes token in header or form field",
+          "Server validates token before processing state-changing requests (POST/PUT/DELETE)",
+          "Stateless APIs (JWT) disable CSRF — token not in request anyway",
+        ],
+        interview: `"CSRF attack: attacker tricks you to click a link that submits form to bank to transfer money. If no CSRF token, your session cookie auto-includes and request succeeds. Spring Security generates a unique token, client must include it. Server validates before executing. Stateless APIs skip this because JWT replaces session cookie."`,
+        code: `// Spring Security CSRF config
+@Bean
+SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        // withHttpOnlyFalse() allows JavaScript to read token
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
+            .anyRequest().authenticated())
+        .formLogin(form -> form.loginPage("/login"));
+    return http.build();
+}
+
+// Server-side rendering: Spring auto-injects CSRF token in form
+<!-- HTML form (Thymeleaf) -->
+<form method="POST" action="/api/orders">
+    <input type="hidden" th:name="\${_csrf.parameterName}" th:value="\${_csrf.token}" />
+    <input type="text" name="productId" />
+    <button>Order</button>
+</form>
+
+// SPA (React/Angular): fetch token from endpoint
+fetch('/api/csrf-token').then(r => r.json()).then(data => {
+    fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': data.token },
+        body: JSON.stringify({ productId: 123 })
+    });
+});
+
+// REST API (stateless/JWT): disable CSRF
+http.csrf(csrf -> csrf.disable())
+.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))`,
+      },
     ],
     trapQuestions: [
       {
