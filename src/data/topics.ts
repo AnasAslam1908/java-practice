@@ -1318,6 +1318,40 @@ http
   .sessionManagement(session ->
       session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));`,
       },
+      {
+        title: "What Is Session?",
+        tag: "Web Basics",
+        keyPoints: [
+          "A session stores user-specific state across multiple HTTP requests",
+          "Server creates a session after login and returns a session id cookie",
+          "Browser sends that session id (for example JSESSIONID) in later requests",
+          "Server uses the id to fetch user data like identity, roles, and cart",
+          "Session ends on logout, timeout, or explicit invalidation",
+        ],
+        interview: `"HTTP is stateless, so session is used to remember a user between requests. After successful login, server creates a session object and sends a session id cookie to client. On each request, server reads that id and loads stored user context. This is called stateful authentication."`,
+        code: `// Login success
+HttpSession session = request.getSession(true);
+session.setAttribute("userId", 101L);
+session.setAttribute("role", "ADMIN");
+
+// Next request (cookie carries JSESSIONID automatically)
+HttpSession s = request.getSession(false);
+if (s != null && s.getAttribute("userId") != null) {
+    // user is logged in
+}
+
+// Logout
+if (s != null) {
+    s.invalidate();
+}`,
+      },
+    ],
+    trapQuestions: [
+      {
+        question: "Session vs Cookie in one line?",
+        answer:
+          "Cookie is a client-side storage mechanism; Session is server-side user state. In session-based auth, cookie usually carries only a session id (JSESSIONID) while actual user data stays on server.",
+      },
     ],
   },
   {
