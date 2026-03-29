@@ -2073,6 +2073,93 @@ public class GlobalExceptionHandler {
     }
 }`,
       },
+      {
+        title: "Spring vs SpringBoot",
+        tag: "Comparison",
+        keyPoints: [
+          "Spring Framework is lightweight IoC container for dependency injection",
+          "Spring Boot removes boilerplate — auto-config, starter POMs, embedded server",
+          "Spring requires manual setup: web.xml, dispatcher servlet, bean definitions",
+          "Spring Boot uses @SpringBootApplication for zero-config deployment",
+          "Spring Boot packages everything into a fat JAR (app + Tomcat inside)",
+        ],
+        interview: `"Spring Framework is the foundation. It provides IoC, AOP, MVC. Spring Boot wraps Spring and adds auto-configuration to eliminate boilerplate. Without Boot, you'd manually configure servlets, listeners, and beans in XML. Boot does all that automatically based on classpath."`,
+        code: `// Spring Framework - Manual setup
+<!-- web.xml (traditional) -->
+<servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </init-param>
+</servlet>
+
+<!-- applicationContext.xml -->
+<bean id="userService" class="com.example.UserService"/>
+
+// Spring Boot - Zero config
+@SpringBootApplication
+public class MyApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MyApp.class, args);
+    }
+}
+
+// One line runs everything: configures servlet, detects beans, starts Tomcat`,
+      },
+      {
+        title: "ORM (Object-Relational Mapping)",
+        tag: "Database Abstraction",
+        keyPoints: [
+          "ORM maps Java objects to database tables automatically",
+          "Eliminates SQL writing — framework generates queries from objects",
+          "Popular ORMs: Hibernate, JPA (standard), EclipseLink, OpenJPA",
+          "@Entity marks class as database table, @Id as primary key",
+          "Relationships: @OneToOne, @OneToMany, @ManyToMany",
+        ],
+        interview: `"ORM bridges object-oriented code with relational databases. Instead of writing SQL, you define @Entity classes with relationships, and framework handles SQL generation. Hibernate is the de-facto standard impl of JPA."`,
+        code: `@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+}
+
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToMany
+    @JoinTable(name = "order_items",
+        joinColumns = @JoinColumn(name = "order_id"),
+        inverseJoinColumns = @JoinColumn(name = "item_id"))
+    private List<Item> items;
+}
+
+// Repository (auto CRUD)
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+}
+
+// Usage
+User u = userRepo.findByEmail("test@example.com").orElse(null);
+// ORM generates appropriate SQL SELECT query automatically`,
+      },
     ],
     trapQuestions: [
       {
