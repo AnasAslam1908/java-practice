@@ -1186,6 +1186,40 @@ int fact(int n) {
     return n * fact(n - 1); // new frame each call
 }`,
       },
+    {
+    title: "How To Create Singleton Class",
+    tag: "Must Know",
+    keyPoints: [
+      "Make constructor private to block direct object creation",
+      "Expose one global access method (getInstance)",
+      "Ensure only one instance exists for entire application",
+      "Use Bill Pugh pattern for lazy, thread-safe initialization",
+      "Use singleton for logger, config manager, and shared caches",
+    ],
+    interview: `"To create a singleton in Java, keep constructor private and expose a static getInstance() method. Best approach is Bill Pugh singleton using a static inner holder class. It gives lazy loading and thread safety without synchronized overhead."`,
+    code: `public class AppConfig {
+  private AppConfig() {} // 1) prevent new AppConfig()
+
+  // 2) loaded only when getInstance() is first called
+  private static class Holder {
+    private static final AppConfig INSTANCE = new AppConfig();
+  }
+
+  // 3) global access point
+  public static AppConfig getInstance() {
+    return Holder.INSTANCE;
+  }
+
+  public String env() {
+    return "prod";
+  }
+}
+
+// Usage
+AppConfig c1 = AppConfig.getInstance();
+AppConfig c2 = AppConfig.getInstance();
+System.out.println(c1 == c2); // true`,
+    },
       {
         title: "For Loop vs Recursion",
         tag: "Interview Style",
