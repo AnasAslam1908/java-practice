@@ -2109,6 +2109,59 @@ public class MyApp {
 // One line runs everything: configures servlet, detects beans, starts Tomcat`,
       },
       {
+        title: "Hibernate",
+        tag: "JPA Implementation",
+        keyPoints: [
+          "Hibernate is the most widely used JPA implementation in Spring Boot",
+          "Manages entity lifecycle: transient, persistent, detached, removed",
+          "Supports lazy loading, caching, dirty checking, and automatic SQL generation",
+          "Use JPQL/Criteria for object-oriented queries and native SQL when needed",
+        ],
+        interview: `"Hibernate is an ORM framework and the de-facto JPA implementation in Spring Boot apps. It maps Java entities to relational tables and handles SQL generation, relationship mapping, dirty checking, and caching. In Spring Boot, we usually use Hibernate through Spring Data JPA so we get both Hibernate power and repository abstraction."`,
+        code: `// application.properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+@Entity
+@Table(name = "products")
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    private BigDecimal price;
+}
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByPriceGreaterThan(BigDecimal minPrice);
+
+    @Query("SELECT p FROM Product p WHERE lower(p.name) like lower(concat('%', :q, '%'))")
+    List<Product> search(@Param("q") String query);
+}
+
+@Service
+public class ProductService {
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Transactional
+    public Product updatePrice(Long id, BigDecimal newPrice) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        p.setPrice(newPrice);
+        return p;
+        // Hibernate dirty checking flushes UPDATE automatically on transaction commit.
+    }
+}`,
+      },
+      {
         title: "ORM (Object-Relational Mapping)",
         tag: "Database Abstraction",
         keyPoints: [
@@ -3086,6 +3139,98 @@ SELECT * FROM users WHERE email = 'john@example.com';
 
 -- Drop index
 DROP INDEX idx_users_email;`,
+      },
+      {
+        title: "Types of Indexes",
+        tag: "Index Structures",
+        keyPoints: [
+          "Clustered: controls physical order of rows, one per table, typically on primary key",
+          "Non-Clustered: separate structure pointing to rows, multiple per table",
+          "B-Tree: balanced tree structure for range queries and equality searches",
+          "Bitmap: uses bitmaps for low-cardinality columns, efficient for filtering",
+        ],
+        interview: `"There are four main index types, each with different use cases. Clustered index determines how data is physically stored — exactly one per table, usually on primary key. Non-clustered indexes are separate structures that point back to rows — you can have many of them. B-Tree is the default and handles both range and equality efficiently. Bitmap indexes use bit arrays and are great for low-cardinality data like gender or status fields."`,
+        code: `-- 1) CLUSTERED INDEX
+-- Controls how rows are physically stored (one per table)
+-- Usually on primary key
+CREATE CLUSTERED INDEX idx_clustered_users_id
+ON users(id);
+
+-- Range query is efficient on clustered index
+SELECT * FROM users
+WHERE id BETWEEN 1000 AND 2000;  -- sequential read
+
+-- 2) NON-CLUSTERED INDEX
+-- Separate B+ tree structure, pointer back to data
+-- Multiple per table (up to 999 in SQL Server)
+CREATE NONCLUSTERED INDEX idx_nonclustered_email
+ON users(email);
+
+-- Extra lookups needed (clustered index seek)
+SELECT * FROM users WHERE email = 'john@example.com';
+
+-- 3) B-TREE INDEX
+-- Default in most databases (PostgreSQL, MySQL, Oracle)
+-- Balanced tree: O(log n) for search, insert, delete
+CREATE INDEX idx_btree_salary ON employees(salary);
+
+-- Efficient for:
+-- - Exact match: WHERE salary = 50000
+-- - Range: WHERE salary BETWEEN 40000 AND 60000
+-- - Prefix: WHERE name LIKE 'John%'
+-- - Sorting: ORDER BY salary (uses index)
+
+-- B-Tree structure:
+-- Root:    [ 40 | 70 ]
+--         /    |    \
+-- Branch: [20][30] [50][60] [80][90]
+--        /  |  |  \  /  |  \  /  |  \
+
+-- 4) BITMAP INDEX
+-- Uses bitmaps (arrays of 1s and 0s) for low-cardinality
+-- Efficient for low selectivity on boolean/enum fields
+-- Common in data warehouses (Oracle, some MongoDB)
+
+-- Example: Status column with 3 values (Active, Inactive, Pending)
+-- Bitmap for Active:    [1, 0, 1, 1, 0, 1, ...]
+-- Bitmap for Inactive:  [0, 1, 0, 0, 1, 0, ...]
+-- Bitmap for Pending:   [0, 0, 0, 0, 0, 0, ...]
+
+-- Space efficient: 3 columns × N rows fits in few KB
+-- Efficient for AND/OR/NOT operations
+
+-- In SQL (Oracle example):
+CREATE BITMAP INDEX idx_bitmap_status
+ON orders(order_status);
+
+-- Query using bitmap index
+SELECT COUNT(*) FROM orders
+WHERE order_status = 'SHIPPED'
+  AND payment_status = 'PAID'
+  AND region = 'US';  -- combines bitmaps with AND
+
+-- COMPARISON TABLE:
+-- |           | Clustered | Non-Clustered | B-Tree    | Bitmap    |
+-- |-----------|-----------|---------------|-----------|-----------|
+-- | Quantity  | 1 per table| Many (999+)   | Many      | Many      |
+-- | Range     | ✓ Great   | ✓ Good        | ✓ Excellent| ✗ Poor   |
+-- | Equality  | ✓ Good    | ✓ Great       | ✓ Excellent| ✓ Good   |
+-- | Space     | Low       | Medium        | Medium    | Very Low  |
+-- | Cardinality| High     | Any           | Any       | Low (1-100)|
+-- | Use Case  | PK Order  | WHERE/JOIN    | General   | Data WH   |
+
+-- When to use each:
+-- Clustered: Primary key (100% of the time)
+-- Non-Clustered: Frequently filtered or joined columns
+-- B-Tree: Default for most queries (general purpose)
+-- Bitmap: Many rows, few distinct values (status, region)
+
+-- Query optimization strategy:
+-- 1. Add clustered index on primary key ✓
+-- 2. Add non-clustered on WHERE columns
+-- 3. Consider composite indexes (col1, col2)
+-- 4. For data warehouse: use bitmap on dimensions (low cardinality)
+-- 5. Monitor with EXPLAIN/ANALYSIS to verify index usage`,
       },
       {
         title: "Normalization",
@@ -4494,6 +4639,230 @@ spring.ai.openai.chat.options.model=gpt-4o-mini
 // \${OPENAI_API_KEY}`,
       },
       {
+        title: "ChatClient and Builder Injection",
+        tag: "Core API",
+        keyPoints: [
+          "ChatClient is a high-level unified API for prompt/response flows",
+          "It is immutable, so you configure it before building the instance",
+          "Spring AI provides ChatClient.Builder, not a ready-made ChatClient bean",
+          "Use different builders to create different clients for different models or use cases",
+        ],
+        interview: `"ChatClient is the service layer for AI calls in Spring AI. It hides the repetitive work of prompt creation, request execution, and response parsing. You usually don't autowire ChatClient directly because Spring provides ChatClient.Builder instead. That makes sense because ChatClient is immutable and applications often need multiple clients for different models, for example a fast cheap one for simple queries and a stronger one for complex tasks. So you inject the builder, customize it, and build the exact client you need."`,
+        code: `@RestController
+@RequestMapping("/ai")
+public class AiController {
+
+    private final ChatClient generalClient;
+    private final ChatClient reasoningClient;
+
+    public AiController(ChatClient.Builder builder) {
+  this.generalClient = builder
+    .defaultSystem("You are a concise Java assistant")
+    .build();
+
+  this.reasoningClient = builder
+    .defaultSystem("You are a detailed Spring Boot expert")
+    .build();
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam String q) {
+  return generalClient.prompt()
+    .user(q)
+    .call()
+    .content();
+    }
+
+    @GetMapping("/explain")
+    public String explain(@RequestParam String topic) {
+  return reasoningClient.prompt()
+    .user("Explain " + topic + " in interview style")
+    .call()
+    .content();
+    }
+}
+
+// Why not autowire ChatClient directly?
+// 1) ChatClient is immutable and must be configured before use.
+// 2) Different features often need different clients/models.
+// 3) Spring AI exposes the Builder so you can create exactly what you need.
+// 4) Constructor injection of the builder keeps the code testable and explicit.`,
+      },
+      {
+        title: "ChatModel API",
+        tag: "Core Contract",
+        keyPoints: [
+          "ChatModel represents a specific chat model provider implementation",
+          "Core contract: given messages/prompt, return model output",
+          "Common implementations include OpenAiChatModel, AzureOpenAiChatModel, and OllamaChatModel",
+          "In business apps, ChatClient is usually preferred unless fine-grained control is required",
+        ],
+        interview: `"ChatModel is the lower-level model abstraction in Spring AI. It represents the actual provider-backed chat engine and exposes the core contract: send a prompt or messages, get a response. Different vendors provide different implementations, such as OpenAiChatModel, AzureOpenAiChatModel, or OllamaChatModel. In most business applications, we use ChatClient for readability and maintainability, and only use ChatModel directly when we need fine-grained control over prompts, metadata, or response handling."`,
+        code: `// ChatModel = provider-specific model implementation behind a common interface
+
+@Service
+public class DirectModelService {
+
+    private final ChatModel chatModel;
+
+    public DirectModelService(ChatModel chatModel) {
+        this.chatModel = chatModel;
+    }
+
+    public String run(String question) {
+        Prompt prompt = new Prompt(question);
+        ChatResponse response = chatModel.call(prompt);
+        return response.getResult().getOutput().getText();
+    }
+}
+
+// Typical implementations (selected by dependency/config):
+// - OpenAiChatModel
+// - AzureOpenAiChatModel
+// - OllamaChatModel
+// - others depending on provider starter
+
+// Practical guidance:
+// - Prefer ChatClient in normal business services/controllers
+// - Use ChatModel directly for advanced, fine-grained control`,
+      },
+      {
+        title: "Architectural Workflow",
+        tag: "System Flow",
+        keyPoints: [
+          "Controller is the HTTP entry point that receives the client request",
+          "ChatClient is the fluent application-facing API used by developers",
+          "ChatModel is the provider-facing abstraction that talks to the model implementation",
+          "LLM is the final intelligence engine that generates the response",
+        ],
+        interview: `"I explain the Spring AI flow like this: Controller -> ChatClient -> ChatModel -> LLM. The Controller receives the request and triggers the AI workflow. ChatClient is the developer-friendly orchestration layer. ChatModel is the abstraction that binds to a specific provider implementation. Finally, the LLM is the actual model that processes the prompt and returns the answer. The goal of this layering is abstraction and modularity, so you can swap providers with minimal code changes."`,
+        code: `@RestController
+@RequestMapping("/chat")
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @GetMapping
+    public String ask(@RequestParam String q) {
+        // Controller -> ChatClient -> ChatModel -> LLM
+        return chatClient.prompt()
+                .user(q)
+                .call()
+                .content();
+    }
+}
+
+// Architectural takeaway:
+// - Controller handles HTTP
+// - ChatClient orchestrates the AI call
+// - ChatModel is the provider abstraction
+// - LLM is the actual model that produces the answer`,
+      },
+      {
+        title: "How OpenAIChatModel Is Created",
+        tag: "Auto Configuration",
+        keyPoints: [
+          "Add spring-ai-starter-model-openai to the classpath",
+          "Spring Boot triggers auto-configuration for the OpenAI chat model",
+          "OpenAiChatAutoConfiguration binds properties and creates the bean",
+          "Spring exposes a singleton OpenAIChatModel bean for injection",
+        ],
+        interview: `"OpenAIChatModel is usually created by Spring Boot auto-configuration. First, you add the OpenAI starter dependency. Then Spring Boot detects it on the classpath and loads the OpenAI chat auto-configuration. That auto-configuration binds the OpenAI properties and creates a singleton OpenAIChatModel bean for you. In practice, this means you do not manually new up the model in your business code unless you need a custom setup."`,
+        code: `// 1) Add the starter
+// pom.xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+
+// 2) Configure application properties
+spring.ai.openai.api-key=\${OPENAI_API_KEY}
+spring.ai.openai.chat.options.model=gpt-4o-mini
+
+// 3) Spring Boot auto-configures the model
+// OpenAiChatAutoConfiguration binds the properties and creates
+// a singleton OpenAIChatModel bean in the application context.
+
+@Service
+public class OpenAiService {
+
+    private final ChatModel chatModel;
+
+    public OpenAiService(ChatModel chatModel) {
+        this.chatModel = chatModel;
+    }
+
+    public String ask(String promptText) {
+        return chatModel.call(new Prompt(promptText))
+                .getResult()
+                .getOutput()
+                .getText();
+    }
+}
+
+// Summary:
+// dependency -> auto-config -> bean created -> inject ChatModel/ChatClient`,
+      },
+      {
+        title: "ChatModel vs ChatClient",
+        tag: "Comparison",
+        keyPoints: [
+          "ChatModel is the lower-level API: you build Prompt/Message objects and handle response structure directly",
+          "ChatClient is a higher-level fluent facade over model calls with cleaner composition",
+          "Choose ChatClient for most controller/service use cases because it is faster to read, test, and maintain",
+          "Choose ChatModel when you need advanced control over request/response flow, metadata, or custom orchestration",
+          "Common production pattern: 80-90% ChatClient, 10-20% ChatModel for special workflows",
+        ],
+        interview: `"ChatModel and ChatClient solve the same problem at different abstraction levels. ChatModel is closer to the provider contract and gives maximum control, but it is more verbose because you manually manage prompts, messages, and response parsing. ChatClient is a fluent API designed for day-to-day application development, so it reduces boilerplate and makes code easier to read. In interviews, I explain it as: ChatModel for low-level control, ChatClient for developer productivity. In real projects I start with ChatClient and switch to ChatModel only when I need custom orchestration or deeper response handling."`,
+        code: `// 1) ChatModel (lower-level)
+@Service
+public class RawAiService {
+
+  private final ChatModel chatModel;
+
+  public RawAiService(ChatModel chatModel) {
+    this.chatModel = chatModel;
+  }
+
+  public String askRaw(String question) {
+    Prompt prompt = new Prompt(question);
+    ChatResponse response = chatModel.call(prompt);
+    return response.getResult().getOutput().getText();
+  }
+}
+
+// 2) ChatClient (higher-level)
+@Service
+public class FluentAiService {
+
+  private final ChatClient chatClient;
+
+  public FluentAiService(ChatClient.Builder builder) {
+    this.chatClient = builder.build();
+  }
+
+  public String askFluent(String question) {
+    return chatClient.prompt()
+        .system("You are a concise Java mentor")
+        .user(question)
+        .call()
+        .content();
+  }
+}
+
+// Interview decision rule:
+// - ChatClient: preferred default for API endpoints and business services.
+// - ChatModel: use when you need low-level prompt/message/response control.
+
+// Quick comparison:
+// ChatModel  -> lower-level, more control, more boilerplate
+// ChatClient -> higher-level, less boilerplate, faster development`,
+      },
+      {
         title: "ChatClient Basics",
         tag: "Core API",
         keyPoints: [
@@ -4544,6 +4913,40 @@ String response = chatClient.prompt()
                 .param("level", "intermediate"))
         .call()
         .content();`,
+      },
+      {
+        title: "Tokenization",
+        tag: "Prompt Management",
+        keyPoints: [
+          "Tokenization splits text into smaller units the model can process",
+          "Every model has a token limit, so prompt size matters",
+          "Use token-aware splitting before sending long documents to a model",
+          "Track token usage to control latency and cost",
+        ],
+        interview: `"Tokenization is how Spring AI and the underlying model measure text. A prompt is not counted by characters or words, but by tokens, so a long-looking sentence may still fit or may exceed the model limit depending on tokenization. In practice, I use token-aware splitting for documents, keep prompts short, and monitor token usage to balance quality, cost, and latency."`,
+        code: `// Tokenization matters when prompts or documents are long.
+// Use token-aware splitting before sending text to the model.
+
+String longDocument = "...very long article or PDF text...";
+
+TokenTextSplitter splitter = new TokenTextSplitter();
+List<String> chunks = splitter.split(longDocument);
+
+for (String chunk : chunks) {
+    String answer = chatClient.prompt()
+            .user("Summarize this chunk:\n" + chunk)
+            .call()
+            .content();
+}
+
+// Keep output size under control with model options
+// spring.ai.openai.chat.options.max-tokens=500
+
+// Tokenization is especially important for:
+// - RAG pipelines
+// - Large prompt templates
+// - Long chat histories
+// - Cost-sensitive applications`,
       },
       {
         title: "RAG with Vector Store",
@@ -4645,6 +5048,126 @@ public class UserLookupService {
         question: "Should API keys be stored in source code for quick setup?",
         answer:
           "Never. Use environment variables or secret managers and keep keys out of repo and logs.",
+      },
+    ],
+  },
+  {
+    id: "ai-concepts",
+    label: "AI Concepts",
+    icon: "🧠",
+    colorClass: "topic-spring",
+    sections: [
+      {
+        title: "Models",
+        tag: "AI Concepts",
+        keyPoints: [
+          "AI models are tools that learn from data to generate things like text, images, speech, or embeddings.",
+          "Spring AI supports many types, including text, image, audio, and embeddings (turning text into numbers for advanced tasks).",
+          "Many supported models come pre-trained, like GPT, so you can use them right away without training your own.",
+        ],
+        interview: `"AI models are systems trained on data that can generate or understand outputs such as text, images, speech, or vectors. In Spring AI, you can work with multiple model types through consistent abstractions. Most teams start with pre-trained models, which is faster and more practical than training from scratch."`,
+        code: `// Common model categories in AI applications:
+// - Text models (chat/completion)
+// - Embedding models (vector generation)
+// - Image models (generation/editing)
+// - Audio models (speech-to-text, text-to-speech)
+
+// In Spring AI, these are accessed through model abstractions
+// and provider starters (OpenAI, Azure OpenAI, Anthropic, Ollama, etc.).`,
+      },
+      {
+        title: "Prompts",
+        tag: "AI Concepts",
+        keyPoints: [
+          "A prompt is what you tell the AI model, like a question or an instruction.",
+          'In Spring AI, prompts can have placeholders (for example "{name}") that are filled with runtime values.',
+          "Prompt templates help keep prompts reusable, consistent, and easier to maintain.",
+        ],
+        interview: `"A prompt is the input instruction you send to the model. In Spring AI, prompt templates let you define placeholders and inject real values at runtime, similar to templating. This keeps prompts cleaner and reduces duplication across services."`,
+        code: `String template = "Hello {name}, explain {topic} in simple terms.";
+
+String response = chatClient.prompt()
+        .user(u -> u.text(template)
+                .param("name", "Anas")
+                .param("topic", "dependency injection"))
+        .call()
+        .content();`,
+      },
+      {
+        title: "Underlying APIs and Abstractions",
+        tag: "AI Concepts",
+        keyPoints: [
+          "Spring AI offers unified, reusable APIs for client connections.",
+          "It also supports vector databases, tool/function calling, and observability.",
+          "Auto-configuration and Spring Boot starters reduce boilerplate.",
+          "RAG is supported as a first-class pattern for grounding model responses.",
+        ],
+        interview: `"Spring AI's value is abstraction. It standardizes common AI integration concerns like model calls, vector store access, tool calling, and observability. With Boot starters and auto-configuration, you write less provider-specific code and keep architecture clean."`,
+        code: `// Underlying concerns Spring AI helps standardize:
+// - Client connections
+// - Vector store integrations
+// - Tool/function calling
+// - Observability and tracing
+// - Auto-configuration via Boot starters
+// - RAG pipelines`,
+      },
+      {
+        title: "Tokens",
+        tag: "AI Concepts",
+        keyPoints: [
+          "Tokens are the smallest pieces of text that an AI model understands.",
+          "A token can be a word, part of a word, or punctuation.",
+          'Example: "unbelievable" may be split into ["un", "believe", "able"].',
+          "Why tokens matter: cost and limits.",
+          "Cost: more text means more tokens and more money.",
+          "Limits: models have a context window (maximum processable tokens).",
+        ],
+        interview: `"Tokenization is fundamental for both cost and reliability. Providers charge by token usage, and every model has a context window. If your input plus output exceeds that limit, quality drops or requests fail. That's why token-aware chunking and concise prompts are production best practices."`,
+        code: `// Token-aware chunking example
+TokenTextSplitter splitter = new TokenTextSplitter();
+List<String> chunks = splitter.split(longText);
+
+for (String chunk : chunks) {
+    chatClient.prompt().user(chunk).call().content();
+}
+
+// Example split:
+// "unbelievable" -> ["un", "believe", "able"]`,
+      },
+      {
+        title: "Embeddings",
+        tag: "AI Concepts",
+        keyPoints: [
+          "Embeddings convert text, images, or videos into vectors (arrays of numbers).",
+          "These vectors capture semantic meaning, not just exact wording.",
+          '"king" and "queen" embeddings are typically closer than "king" and "car".',
+          "Embeddings enable similarity search by comparing vector distances.",
+          "Useful for semantic search and RAG (Retrieval Augmented Generation).",
+        ],
+        interview: `"Embeddings represent content as numbers in a high-dimensional space. Items with similar meaning are close together in that space. This is the foundation for semantic search and RAG retrieval, where relevant chunks are selected by vector similarity, not just keyword matching."`,
+        code: `// Conceptual embedding flow:
+// 1) Convert text to vector embeddings
+// 2) Store vectors in a vector database
+// 3) Query by similarity (cosine/dot-product distance)
+// 4) Return top-k relevant chunks for RAG`,
+      },
+      {
+        title: "Structured Output",
+        tag: "AI Concepts",
+        keyPoints: [
+          "By default, AI responses are plain strings, even if they look like JSON.",
+          "Plain text output can be invalid JSON or include extra text.",
+          "That creates parsing and validation problems in application code.",
+          "Structured output converters guide the model and map text to real Java objects.",
+          "Converters can validate and retry when output shape is invalid.",
+        ],
+        interview: `"A common production issue is treating LLM output as guaranteed JSON. Even when it looks structured, it's still text and can break parsing. Structured output conversion solves this by constraining the format, validating the result, and mapping it into typed Java objects with safer downstream usage."`,
+        code: `// Problem: model returns JSON-like text, but it is still just a String.
+String raw = chatClient.prompt().user("Return user as JSON").call().content();
+
+// Better: use structured output conversion to map into DTOs
+// and validate format before business logic consumes it.
+// (Exact converter type depends on Spring AI version and setup.)`,
       },
     ],
   },
