@@ -234,6 +234,84 @@ amazon.hireEmployee(e1);  // same employee, associated with multiple companies
 // e1 exists independently of both companies ✅`,
       },
       {
+        title: "Generalization & Specialization",
+        tag: "Hierarchy Design",
+        keyPoints: [
+          "Generalization = move common features from specific classes to a parent",
+          "Specialization = create child classes with unique behavior from a general parent",
+          "This is an IS-A relationship (inheritance), not HAS-A association",
+          "Use generalization to remove duplication; use specialization to model differences",
+          "In UML: arrow points from specialized class to generalized class",
+        ],
+        interview: `"Generalization and specialization are opposite directions of inheritance modeling. In generalization, I identify common code in multiple classes and pull it into one parent. In specialization, I take a general parent and create more specific child classes. Example: Vehicle is generalized, Car and Bike are specialized classes. This is IS-A, not association/HAS-A."`,
+        code: `// Generalization: extracting common behavior
+class Vehicle {
+  protected String brand;
+
+  public void start() {
+    System.out.println("Vehicle started");
+  }
+}
+
+// Specialization: adding specific behavior
+class Car extends Vehicle {
+  public void openTrunk() {
+    System.out.println("Trunk opened");
+  }
+}
+
+class Bike extends Vehicle {
+  public void kickStart() {
+    System.out.println("Bike kick-started");
+  }
+}
+
+// Usage
+Vehicle v1 = new Car();
+Vehicle v2 = new Bike();
+v1.start();
+v2.start();
+
+// Note:
+// Vehicle-Car/Bike => Generalization/Specialization (IS-A)
+// Car-Engine        => Association/Composition (HAS-A)`,
+      },
+      {
+        title: "Sibling Class",
+        tag: "Same Parent",
+        keyPoints: [
+          "Sibling classes share the same direct parent class",
+          "They are at the same hierarchy level",
+          "Siblings can reuse parent behavior but have different specializations",
+          "One sibling is NOT a subtype of another sibling",
+          "Example: Dog and Cat are siblings if both extend Animal",
+        ],
+        interview: `"Sibling classes are classes that have the same parent. For example Dog and Cat both extend Animal, so they are sibling classes. They both are Animal, but Dog is not Cat and Cat is not Dog. Siblings inherit common behavior from parent and add their own specific behavior."`,
+        code: `class Animal {
+  public void eat() {
+    System.out.println("Animal eats");
+  }
+}
+
+class Dog extends Animal {
+  public void bark() {
+    System.out.println("Woof");
+  }
+}
+
+class Cat extends Animal {
+  public void meow() {
+    System.out.println("Meow");
+  }
+}
+
+// Dog and Cat are sibling classes
+Dog d = new Dog();
+Cat c = new Cat();
+d.eat(); // inherited from Animal
+c.eat(); // inherited from Animal`,
+      },
+      {
         title: "Association vs Inheritance",
         tag: "Design Decision",
         keyPoints: [
