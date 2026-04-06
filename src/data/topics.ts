@@ -1158,6 +1158,40 @@ class OrderService {
 // Spring: @Autowired injects automatically
 // Tests: new OrderService(new MockRepo())`,
       },
+      {
+        title: "Production Guardrails",
+        tag: "Best Practices",
+        keyPoints: [
+          "Add timeouts, retries, and circuit breakers around model calls",
+          "Use content filtering and output validation",
+          "Track prompt/response metrics, latency, token usage, and errors",
+          "Prefer fallback responses when provider is unavailable",
+        ],
+        interview: `"Treat LLM calls like external network dependencies. Add resilience patterns, sanitize inputs, validate outputs, and monitor token/latency costs. For critical flows, provide deterministic fallbacks."`,
+        code: `// Suggested reliability checklist:
+// 1) Timeout per model call
+// 2) Retry with backoff for transient failures
+// 3) Circuit breaker for provider outages
+// 4) Structured logging for prompt id, latency, token usage
+// 5) Fallback message when model call fails`,
+      },
+      {
+        title: "Production Guardrails",
+        tag: "Best Practices",
+        keyPoints: [
+          "Add timeouts, retries, and circuit breakers around model calls",
+          "Use content filtering and output validation",
+          "Track prompt/response metrics, latency, token usage, and errors",
+          "Prefer fallback responses when provider is unavailable",
+        ],
+        interview: `"Treat LLM calls like external network dependencies. Add resilience patterns, sanitize inputs, validate outputs, and monitor token/latency costs. For critical flows, provide deterministic fallbacks."`,
+        code: `// Suggested reliability checklist:
+// 1) Timeout per model call
+// 2) Retry with backoff for transient failures
+// 3) Circuit breaker for provider outages
+// 4) Structured logging for prompt id, latency, token usage
+// 5) Fallback message when model call fails`,
+      },
     ],
     trapQuestions: [
       {
@@ -5086,6 +5120,27 @@ public class UserLookupService {
 // after model call: append user + assistant messages
 
 // Keep memory bounded to avoid token explosion.`,
+      },
+      {
+        title: "Advisor",
+        tag: "Assistant Patterns",
+        keyPoints: [
+          "Advisor composes memory, retrieval (RAG), and tools into a reusable assistant",
+          "Use Advisors to implement personas, long-lived assistants, and domain-specific workflows",
+          "Advisors orchestrate ChatClient, VectorStore, and Memory to reduce boilerplate",
+          "Persist only essential memory; keep sensitive data out of long-term memory",
+        ],
+        interview: `"An Advisor is a higher-level orchestrator in Spring AI that bundles prompt templates, memory management, retrieval, and tool calling into a single reusable assistant persona. It lets you define interview-style assistants, helpers, or domain experts without scattering orchestration code across controllers."`,
+        code: `// Conceptual example — configure an Advisor bean
+@Bean
+public Advisor interviewAdvisor(ChatClient.Builder builder, VectorStore store, Memory memory) {
+    return Advisor.builder()
+        .chatClient(builder.defaultSystem("You are an interview coach").build())
+        .vectorStore(store)
+        .memory(memory)
+        .build();
+}
+// Use advisor in services to run persona-driven flows`,
       },
       {
         title: "Production Guardrails",
