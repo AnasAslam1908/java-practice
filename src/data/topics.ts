@@ -2486,18 +2486,6 @@ User u = userRepo.findByEmail("test@example.com").orElse(null);
     colorClass: "topic-ds",
     sections: [
       {
-        title: "Time and Space Complexity",
-        tag: "Big-O",
-        keyPoints: [
-          "Covers quick reference tables for common operations",
-          "Includes detailed O(1), O(log n), O(n), O(n log n), O(n²), and O(2ⁿ) examples",
-          "Explains loop and recursion-based complexity calculation",
-          "Includes data-structure operation cheat sheets and interview tips",
-        ],
-        interview: `"This section gives a complete quick-reference plus worked examples for both time and space complexity so you can explain Big-O clearly in interviews and while solving DSA problems."`,
-        code: timeSpaceComplexityNotes,
-      },
-      {
         title: "Arrays",
         tag: "Foundation",
         keyPoints: [
@@ -2514,7 +2502,6 @@ nums[1] = 20;
 
 // Array with initializer
 String[] names = {"Alice", "Bob", "Charlie"};
-
 // Iterate
 for (int i = 0; i < names.length; i++) {
     System.out.println(names[i]);
@@ -5315,6 +5302,26 @@ String raw = chatClient.prompt().user("Return user as JSON").call().content();
 // Better: use structured output conversion to map into DTOs
 // and validate format before business logic consumes it.
 // (Exact converter type depends on Spring AI version and setup.)`,
+      },
+    ],
+  },
+  {
+    id: "complexity",
+    label: "Time & Space Complexity",
+    icon: "⏱️",
+    colorClass: "topic-ds",
+    sections: [
+      {
+        title: "Time and Space Complexity",
+        tag: "Big-O",
+        keyPoints: [
+          "Covers quick reference tables for common operations",
+          "Includes detailed O(1), O(log n), O(n), O(n log n), O(n²), and O(2ⁿ) examples",
+          "Explains loop and recursion-based complexity calculation",
+          "Includes data-structure operation cheat sheets and interview tips",
+        ],
+        interview: `"This section gives a complete quick-reference plus worked examples for both time and space complexity so you can explain Big-O clearly in interviews and while solving DSA problems."`,
+        code: timeSpaceComplexityNotes,
       },
     ],
   },

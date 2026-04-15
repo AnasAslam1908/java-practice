@@ -592,3 +592,334 @@ Variable-size array (int[n]) O(n)
 Recursion depth = n O(n)
 Recursion depth = log n O(log n)
 HashMap with n entries O(n)
+
+## Time & Space Complexity Analysis
+
+Complexity analysis measures how an algorithm's resource usage scales with input size **n**.
+
+---
+
+### Time Complexity
+
+Measures **how many operations** an algorithm performs relative to input size.
+
+**Rules:**
+
+- Drop constants → `O(2n)` becomes `O(n)`
+- Drop lower-order terms → `O(n² + n)` becomes `O(n²)`
+- Worst case is usually what matters
+
+---
+
+### Common Complexities (Best → Worst)
+
+| Complexity | Name         | Example               |
+| ---------- | ------------ | --------------------- |
+| O(1)       | Constant     | Array access          |
+| O(log n)   | Logarithmic  | Binary search         |
+| O(n)       | Linear       | Single loop           |
+| O(n log n) | Linearithmic | Merge sort            |
+| O(n²)      | Quadratic    | Nested loops          |
+| O(2ⁿ)      | Exponential  | Recursion (Fibonacci) |
+
+---
+
+### Java Examples
+
+#### O(1) — Constant
+
+```java
+int getFirst(int[] arr) {
+    return arr[0]; // Always 1 operation, no matter array size
+}
+```
+
+**Space:** O(1) — no extra memory used.
+
+---
+
+#### O(n) — Linear
+
+```java
+int sum(int[] arr) {
+    int total = 0;           // 1 variable
+    for (int x : arr) {      // loops n times
+        total += x;          // 1 operation per loop
+    }
+    return total;
+}
+```
+
+**Time:** O(n) — loop runs `n` times.
+**Space:** O(1) — only one extra variable `total`, regardless of input size.
+
+---
+
+#### O(n²) — Quadratic (Nested Loops)
+
+```java
+void printPairs(int[] arr) {
+    for (int i = 0; i < arr.length; i++) {       // n times
+        for (int j = 0; j < arr.length; j++) {   // n times each
+            System.out.println(arr[i] + ", " + arr[j]);
+        }
+    }
+}
+```
+
+**Time:** O(n × n) = **O(n²)**
+**Space:** O(1) — no extra data structures.
+
+---
+
+#### O(log n) — Logarithmic (Binary Search)
+
+```java
+int binarySearch(int[] arr, int target) {
+    int left = 0, right = arr.length - 1;
+    while (left <= right) {           // halves search space each time
+        int mid = (left + right) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target)  left = mid + 1;
+        else                         right = mid - 1;
+    }
+    return -1;
+}
+```
+
+**Time:** O(log n) — input is halved each iteration.
+**Space:** O(1) — only a few variables.
+
+---
+
+#### O(n) Space — Extra Data Structure
+
+```java
+int[] copyArray(int[] arr) {
+    int[] copy = new int[arr.length]; // allocates n space
+    for (int i = 0; i < arr.length; i++) {
+        copy[i] = arr[i];
+    }
+    return copy;
+}
+```
+
+**Time:** O(n)
+**Space:** O(n) — new array grows with input.
+
+---
+
+#### O(n) Space — Recursion (Call Stack)
+
+```java
+int factorial(int n) {
+    if (n == 0) return 1;
+    return n * factorial(n - 1); // n recursive calls on the stack
+}
+```
+
+**Time:** O(n) — called `n` times.
+**Space:** O(n) — each call occupies a stack frame.
+
+---
+
+### How to Analyze Any Code — Mental Checklist
+
+```
+1. Single loop            → O(n)
+2. Nested loops           → O(n^depth)
+3. Halving each step      → O(log n)
+4. Loop + halving         → O(n log n)
+5. Recursion branches×2   → O(2ⁿ)
+
+Space:
+1. Fixed variables        → O(1)
+2. Array/list of size n   → O(n)
+3. Recursion depth d      → O(d)
+4. 2D matrix n×n          → O(n²)
+```
+
+The key insight is to **count how the number of operations or memory grows as n increases**, not the exact count.
+
+## Great Question!
+
+### Why Loop Variables Are Still O(1) Space
+
+Yes, variables inside loops **do count** — but they are **fixed in number** regardless of input size. That's the key.
+
+```java
+int sum(int[] arr) {
+    int total = 0;   // 1 variable
+    int i = 0;       // 1 variable
+    // ↑ These don't grow. Whether arr has 10 or 10 million elements,
+    //   you still only have 2 variables.
+    for (i = 0; i < arr.length; i++) {
+        total += arr[i];
+    }
+    return total;
+}
+```
+
+**Space = O(1)** because the count of variables is **constant**, not dependent on `n`.
+
+> **Rule:** It's not about _how many variables_ — it's about _does memory usage grow with input size?_
+
+---
+
+### The Contrast — When It DOES Grow
+
+```java
+int[] storeDoubles(int[] arr) {
+    int[] result = new int[arr.length]; // ← grows with n!
+    int temp = 0;                       // ← fixed, O(1)
+    for (int i = 0; i < arr.length; i++) {
+        temp = arr[i] * 2;      // temp is reused each iteration, not accumulated
+        result[i] = temp;
+    }
+    return result;
+}
+```
+
+- `temp` and `i` → **O(1)** (fixed, reused)
+- `result[]` → **O(n)** (grows with input)
+- **Total Space: O(n)**
+
+---
+
+## HashMap & Other Data Structures
+
+### HashMap — O(n) Space
+
+```java
+// Count frequency of each element
+Map<Integer, Integer> frequencyCount(int[] arr) {
+    Map<Integer, Integer> map = new HashMap<>(); // grows with unique elements
+
+    for (int num : arr) {                        // O(n) time
+        map.put(num, map.getOrDefault(num, 0) + 1); // O(1) per operation
+    }
+
+    return map;
+}
+```
+
+|           | Complexity                           |
+| --------- | ------------------------------------ |
+| **Time**  | O(n) — one pass through array        |
+| **Space** | O(n) — map can store up to n entries |
+
+---
+
+### HashMap Lookup — O(1) Time
+
+```java
+// Check if array has duplicates
+boolean hasDuplicate(int[] arr) {
+    Set<Integer> seen = new HashSet<>();  // O(n) space
+
+    for (int num : arr) {                 // O(n) loop
+        if (seen.contains(num)) return true; // O(1) ← HashMap lookup is constant!
+        seen.add(num);                       // O(1)
+    }
+    return false;
+}
+```
+
+> HashMap `get`, `put`, `containsKey` are all **O(1)** average time — that's their superpower.
+
+---
+
+### Two Sum using HashMap
+
+```java
+int[] twoSum(int[] arr, int target) {
+    Map<Integer, Integer> map = new HashMap<>(); // stores value → index
+
+    for (int i = 0; i < arr.length; i++) {  // O(n)
+        int complement = target - arr[i];
+
+        if (map.containsKey(complement)) {   // O(1) lookup
+            return new int[]{map.get(complement), i};
+        }
+
+        map.put(arr[i], i);                  // O(1) insert
+    }
+    return new int[]{};
+}
+```
+
+|           | Complexity                                 |
+| --------- | ------------------------------------------ |
+| **Time**  | O(n) — single loop, O(1) operations inside |
+| **Space** | O(n) — map grows up to n entries           |
+
+Without HashMap this would be **O(n²)** using nested loops — HashMap makes it **O(n)**. That's the trade-off: **spend space to save time.**
+
+---
+
+### ArrayList — Dynamic Growth
+
+```java
+List<Integer> getEvens(int[] arr) {
+    List<Integer> evens = new ArrayList<>(); // starts empty, grows
+
+    for (int num : arr) {       // O(n)
+        if (num % 2 == 0) {
+            evens.add(num);     // O(1) amortized
+        }
+    }
+    return evens;
+}
+```
+
+|           | Complexity                                 |
+| --------- | ------------------------------------------ |
+| **Time**  | O(n)                                       |
+| **Space** | O(n) worst case — if all elements are even |
+
+---
+
+### Stack — O(n) Space
+
+```java
+// Check balanced parentheses
+boolean isBalanced(String s) {
+    Stack<Character> stack = new Stack<>(); // grows with input
+
+    for (char c : s.toCharArray()) {   // O(n)
+        if (c == '(') stack.push(c);   // O(1)
+        else if (c == ')') {
+            if (stack.isEmpty()) return false;
+            stack.pop();               // O(1)
+        }
+    }
+    return stack.isEmpty();
+}
+```
+
+|           | Complexity                                |
+| --------- | ----------------------------------------- |
+| **Time**  | O(n)                                      |
+| **Space** | O(n) — worst case all `(` pushed to stack |
+
+---
+
+### Quick Reference — Data Structure Complexities
+
+| Structure  | Access | Search | Insert | Delete | Space |
+| ---------- | ------ | ------ | ------ | ------ | ----- |
+| Array      | O(1)   | O(n)   | O(n)   | O(n)   | O(n)  |
+| ArrayList  | O(1)   | O(n)   | O(1)\* | O(n)   | O(n)  |
+| HashMap    | O(1)   | O(1)   | O(1)   | O(1)   | O(n)  |
+| HashSet    | —      | O(1)   | O(1)   | O(1)   | O(n)  |
+| Stack      | O(n)   | O(n)   | O(1)   | O(1)   | O(n)  |
+| LinkedList | O(n)   | O(n)   | O(1)   | O(1)   | O(n)  |
+
+\*ArrayList insert is O(1) **amortized** — occasionally resizes at O(n)
+
+---
+
+### The Golden Rule to Remember
+
+> **Time complexity** = count how many times operations **execute**
+> **Space complexity** = count how much memory **accumulates** (variables that _grow_, not variables that _exist_)
