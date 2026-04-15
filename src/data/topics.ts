@@ -1550,169 +1550,378 @@ if (s != null) {
     colorClass: "topic-patterns",
     sections: [
       {
-        title: "Singleton Pattern",
-        tag: "One Instance",
-        keyPoints: [
-          "One instance for the entire application",
-          "Use cases: DB pool, Logger, Config",
-          "Bill Pugh (static inner class) is preferred in Java",
-          "Thread-safe without synchronization overhead",
-        ],
-        interview: `"One instance for the entire app — DB connection pool, Logger, Config. Bill Pugh (static inner class) is the best Java approach — lazily loaded and thread-safe without synchronization overhead."`,
-        code: `// Bill Pugh Singleton — preferred
-public class Logger {
-    private Logger() {}
+      title: "Design Patterns Visual Map",
+      tag: "All 9 Patterns",
+      keyPoints: [
+        "Creational: Singleton, Factory, Builder",
+        "Structural: Adapter, Decorator, Facade",
+        "Behavioral: Observer, Strategy, Command",
+        "Think in categories first, then select pattern by problem",
+      ],
+      interview: `"A clean way to explain design patterns is by category. Creational controls object creation, Structural composes objects, Behavioral manages communication. Then give one real use case per pattern."`,
+      code: `# Creational Patterns - How objects are created
+  1) Singleton
+  2) Factory
+  3) Builder
 
-    private static class Holder {       // loaded only when accessed
-        private static final Logger INSTANCE = new Logger();
-    }
+  # Structural Patterns - How objects fit together
+  4) Adapter
+  5) Decorator
+  6) Facade
 
-    public static Logger getInstance() {
-        return Holder.INSTANCE;         // JVM guarantees thread safety
-    }
-
-    public void log(String msg) {
-        System.out.println("[LOG] " + msg);
-    }
-}
-
-// Double-Checked Locking — explicit thread control
-public class DBPool {
-    private static volatile DBPool instance;
-
-    private DBPool() {}
-
-    public static DBPool getInstance() {
-        if (instance == null) {
-            synchronized (DBPool.class) {
-                if (instance == null) {   // double-check after lock
-                    instance = new DBPool();
-                }
-            }
-        }
-        return instance;
-    }
-}
-
-Logger.getInstance().log("App started");`,
+  # Behavioral Patterns - How objects communicate
+  7) Observer
+  8) Strategy
+  9) Command`,
       },
       {
-        title: "Factory Pattern",
-        tag: "Delegate Creation",
+      title: "Singleton",
+      tag: "Creational",
         keyPoints: [
-          "Delegate object creation to a factory method",
-          "Caller specifies what, not how to build",
-          "Follows Open/Closed principle",
-          "Spring's ApplicationContext is a factory",
+        "Only one object of a class should ever exist",
+        "Private constructor prevents direct instantiation",
+        "Expose a global access method like getInstance()",
+        "Good for logger, config manager, and shared pools",
         ],
-        interview: `"Delegate object creation to a factory. Caller says what it wants, not how to build it. Follows Open/Closed — add new types by adding new classes. Spring's ApplicationContext IS a factory."`,
-        code: `interface Notification {
-    void send(String message);
-}
+      interview: `"Singleton means one instance, globally accessible. It centralizes shared state and prevents duplicate resource-heavy objects."`,
+      code: `public class DatabaseConnection {
+    private static DatabaseConnection instance;
 
-class EmailNotification implements Notification {
-    public void send(String msg) { System.out.println("Email: " + msg); }
-}
+    private DatabaseConnection() {}
 
-class SMSNotification implements Notification {
-    public void send(String msg) { System.out.println("SMS: " + msg); }
-}
+    public static DatabaseConnection getInstance() {
+      if (instance == null) {
+        instance = new DatabaseConnection();
+      }
+      return instance;
+    }
 
-class NotificationFactory {
-    public static Notification create(String type) {
-        switch (type) {
-            case "EMAIL": return new EmailNotification();
-            case "SMS":   return new SMSNotification();
-            default: throw new IllegalArgumentException("Unknown: " + type);
-        }
+    public void query(String sql) {
+      System.out.println("Running: " + sql);
     }
 }
 
-Notification n = NotificationFactory.create("SMS");
-n.send("Your OTP is 4521");`,
+  DatabaseConnection db1 = DatabaseConnection.getInstance();
+  DatabaseConnection db2 = DatabaseConnection.getInstance();
+  // db1 == db2 -> true`,
       },
       {
-        title: "Observer Pattern",
-        tag: "Event Driven",
+      title: "Factory",
+      tag: "Creational",
         keyPoints: [
-          "When one object changes, all dependents are notified",
-          "Decouples publisher from subscribers",
-          "Spring's ApplicationEvent uses this pattern",
-          "Perfect for order processing pipelines",
+        "Create objects via a factory instead of calling new directly",
+        "Caller requests type; factory decides concrete class",
+        "Decouples creation logic from usage",
+        "Easy to extend with new implementations",
         ],
-        interview: `"When one object changes, all dependents are notified. Spring's ApplicationEvent is built on this. Perfect for order processing — place an order, trigger email + inventory + analytics without coupling the services."`,
-        code: `interface OrderObserver {
-    void onOrderPlaced(String orderId);
+      interview: `"Factory lets code ask for what it needs without knowing construction details. This keeps business logic cleaner and open for extension."`,
+      code: `interface Animal {
+    void speak();
 }
 
-class EmailService implements OrderObserver {
-    public void onOrderPlaced(String id) {
-        System.out.println("Email sent: " + id);
+  class Dog implements Animal {
+    public void speak() { System.out.println("Woof!"); }
+}
+
+  class Cat implements Animal {
+    public void speak() { System.out.println("Meow!"); }
+}
+
+  class AnimalFactory {
+    public static Animal create(String type) {
+      return switch (type) {
+        case "dog" -> new Dog();
+        case "cat" -> new Cat();
+        default -> throw new IllegalArgumentException("Unknown animal");
+      };
     }
-}
+  }
 
-class InventoryService implements OrderObserver {
-    public void onOrderPlaced(String id) {
-        System.out.println("Stock reduced: " + id);
-    }
-}
-
-class OrderService {
-    private List<OrderObserver> observers = new ArrayList<>();
-
-    public void subscribe(OrderObserver o) { observers.add(o); }
-
-    public void placeOrder(String orderId) {
-        System.out.println("Order placed: " + orderId);
-        observers.forEach(o -> o.onOrderPlaced(orderId));
-    }
-}
-
-OrderService svc = new OrderService();
-svc.subscribe(new EmailService());
-svc.subscribe(new InventoryService());
-svc.placeOrder("ORD-001"); // both notified!`,
+  Animal a = AnimalFactory.create("dog");
+  a.speak();`,
       },
       {
-        title: "Builder Pattern",
-        tag: "Complex Objects",
-        keyPoints: [
-          "Fluent API for constructing objects with many optional fields",
-          "Avoids telescoping constructors",
-          "Lombok's @Builder generates this automatically",
-          "Java's StringBuilder is a classic example",
-        ],
-        interview: `"When a class has many optional fields, constructors get ugly. Builder gives a fluent API. Java's StringBuilder is the classic example. Mention Lombok's @Builder which generates this boilerplate automatically."`,
-        code: `public class User {
-    private final String name;    // required
-    private final String email;   // required
-    private final String phone;   // optional
-    private final int age;        // optional
+      title: "Builder",
+      tag: "Creational",
+      keyPoints: [
+        "Build complex objects step by step",
+        "Best when many optional fields are present",
+        "Improves readability over long constructors",
+        "Supports fluent chaining",
+      ],
+      interview: `"Builder avoids telescoping constructors. It gives readable, chainable object construction with clear defaults and optional fields."`,
+      code: `class Pizza {
+    String size, crust, sauce, topping;
 
-    private User(Builder b) {
-        this.name  = b.name;
-        this.email = b.email;
-        this.phone = b.phone;
-        this.age   = b.age;
+    private Pizza(Builder b) {
+      this.size = b.size;
+      this.crust = b.crust;
+      this.sauce = b.sauce;
+      this.topping = b.topping;
     }
 
     public static class Builder {
-        private String name, email, phone;
-        private int age;
+      String size, crust = "thin", sauce = "tomato", topping = "none";
 
-        public Builder(String name, String email) {
-            this.name = name; this.email = email;
-        }
-        public Builder phone(String p) { this.phone = p; return this; }
-        public Builder age(int a)      { this.age = a;   return this; }
-        public User build()            { return new User(this); }
+      public Builder(String size) { this.size = size; }
+      public Builder crust(String c)   { crust = c;   return this; }
+      public Builder sauce(String s)   { sauce = s;   return this; }
+      public Builder topping(String t) { topping = t; return this; }
+      public Pizza build() { return new Pizza(this); }
     }
 }
 
-User user = new User.Builder("John", "john@gmail.com")
-    .phone("9876543210")
-    .age(28)
+  Pizza p = new Pizza.Builder("large")
+    .crust("thick")
+    .topping("mushrooms")
     .build();`,
+      },
+      {
+      title: "Adapter",
+      tag: "Structural",
+        keyPoints: [
+        "Converts incompatible interfaces to work together",
+        "Wraps legacy or third-party classes",
+        "Acts as a bridge between expected and existing APIs",
+        "Promotes reuse without modifying old code",
+        ],
+      interview: `"Adapter is like a plug converter. It lets existing incompatible classes work with new code by translating calls."`,
+      code: `class OldPrinter {
+    public void printDocument(String text) {
+      System.out.println("OLD: " + text);
+    }
+  }
+
+  interface ModernPrinter {
+    void print(String text);
+  }
+
+  class PrinterAdapter implements ModernPrinter {
+    private OldPrinter oldPrinter;
+
+    public PrinterAdapter(OldPrinter op) { this.oldPrinter = op; }
+
+    public void print(String text) {
+      oldPrinter.printDocument(text);
+    }
+}
+
+  ModernPrinter printer = new PrinterAdapter(new OldPrinter());
+  printer.print("Hello");`,
+      },
+      {
+      title: "Decorator",
+      tag: "Structural",
+      keyPoints: [
+        "Adds behavior by wrapping objects",
+        "No need to modify original class",
+        "Multiple decorators can be stacked",
+        "Flexible alternative to deep inheritance trees",
+      ],
+      interview: `"Decorator enhances objects at runtime by wrapping them. It is perfect when you want feature combinations without creating many subclasses."`,
+      code: `interface Coffee {
+    String getDescription();
+    double getCost();
+  }
+
+  class SimpleCoffee implements Coffee {
+    public String getDescription() { return "Coffee"; }
+    public double getCost() { return 1.0; }
+  }
+
+  class MilkDecorator implements Coffee {
+    private Coffee coffee;
+    public MilkDecorator(Coffee c) { this.coffee = c; }
+    public String getDescription() { return coffee.getDescription() + ", Milk"; }
+    public double getCost() { return coffee.getCost() + 0.5; }
+  }
+
+  class SugarDecorator implements Coffee {
+    private Coffee coffee;
+    public SugarDecorator(Coffee c) { this.coffee = c; }
+    public String getDescription() { return coffee.getDescription() + ", Sugar"; }
+    public double getCost() { return coffee.getCost() + 0.25; }
+  }
+
+  Coffee c = new SugarDecorator(new MilkDecorator(new SimpleCoffee()));
+  System.out.println(c.getDescription());
+  System.out.println(c.getCost());`,
+      },
+      {
+      title: "Facade",
+      tag: "Structural",
+      keyPoints: [
+        "Provides one simplified API over a complex subsystem",
+        "Reduces client-side complexity and coupling",
+        "Useful for onboarding and service boundaries",
+        "Client calls one method instead of many",
+      ],
+      interview: `"Facade is a front desk for a complex subsystem. It hides coordination details and gives callers a clean, simple entry point."`,
+      code: `class CPU { public void start() { System.out.println("CPU started"); } }
+  class Memory { public void load() { System.out.println("Memory loaded"); } }
+  class HardDrive { public void read() { System.out.println("HDD reading"); } }
+
+  class ComputerFacade {
+    private CPU cpu = new CPU();
+    private Memory mem = new Memory();
+    private HardDrive hdd = new HardDrive();
+
+    public void startComputer() {
+      cpu.start();
+      mem.load();
+      hdd.read();
+      System.out.println("Computer ready!");
+    }
+  }
+
+  new ComputerFacade().startComputer();`,
+      },
+      {
+      title: "Observer",
+      tag: "Behavioral",
+      keyPoints: [
+        "Subscribers get updates when publisher state changes",
+        "Decouples event producer from event consumers",
+        "Great for notifications and event-driven workflows",
+        "Supports dynamic subscribe/unsubscribe",
+      ],
+      interview: `"Observer enables publish-subscribe communication. When the subject changes, all subscribers are notified automatically without tight coupling."`,
+      code: `import java.util.*;
+
+  interface Observer {
+    void update(String event);
+  }
+
+  class EventChannel {
+    private List<Observer> subscribers = new ArrayList<>();
+
+    public void subscribe(Observer o) { subscribers.add(o); }
+    public void unsubscribe(Observer o) { subscribers.remove(o); }
+
+    public void publish(String event) {
+      for (Observer o : subscribers) o.update(event);
+    }
+  }
+
+  class User implements Observer {
+    private String name;
+    public User(String name) { this.name = name; }
+    public void update(String event) {
+      System.out.println(name + " notified: " + event);
+    }
+  }
+
+  EventChannel channel = new EventChannel();
+  channel.subscribe(new User("Alice"));
+  channel.subscribe(new User("Bob"));
+  channel.publish("New video uploaded!");`,
+      },
+      {
+      title: "Strategy",
+      tag: "Behavioral",
+      keyPoints: [
+        "Encapsulates interchangeable algorithms",
+        "Choose algorithm at runtime",
+        "Client code stays unchanged while behavior swaps",
+        "Common in sorting, pricing, payment, and validation",
+      ],
+      interview: `"Strategy separates algorithm from client code. You can swap behavior at runtime without changing the object that uses it."`,
+      code: `interface SortStrategy {
+    void sort(int[] data);
+  }
+
+  class BubbleSort implements SortStrategy {
+    public void sort(int[] data) { System.out.println("Bubble sorting..."); }
+  }
+
+  class QuickSort implements SortStrategy {
+    public void sort(int[] data) { System.out.println("Quick sorting..."); }
+  }
+
+  class Sorter {
+    private SortStrategy strategy;
+
+    public Sorter(SortStrategy s) { this.strategy = s; }
+    public void setStrategy(SortStrategy s) { this.strategy = s; }
+    public void sort(int[] data) { strategy.sort(data); }
+  }
+
+  Sorter sorter = new Sorter(new BubbleSort());
+  sorter.sort(new int[]{5, 3, 1});
+  sorter.setStrategy(new QuickSort());
+  sorter.sort(new int[]{5, 3, 1});`,
+      },
+      {
+      title: "Command",
+      tag: "Behavioral",
+      keyPoints: [
+        "Wraps requests as objects",
+        "Supports undo, queueing, logging, and delayed execution",
+        "Decouples invoker from receiver",
+        "Useful in UI actions and job schedulers",
+      ],
+      interview: `"Command packages an action into an object. This makes operations replayable, undoable, and schedulable while keeping invoker and receiver decoupled."`,
+      code: `import java.util.Stack;
+
+  interface Command {
+    void execute();
+    void undo();
+  }
+
+  class Light {
+    public void on() { System.out.println("Light ON"); }
+    public void off() { System.out.println("Light OFF"); }
+  }
+
+  class LightOnCommand implements Command {
+    private Light light;
+    public LightOnCommand(Light l) { this.light = l; }
+    public void execute() { light.on(); }
+    public void undo() { light.off(); }
+  }
+
+  class RemoteControl {
+    private Stack<Command> history = new Stack<>();
+
+    public void press(Command cmd) {
+      cmd.execute();
+      history.push(cmd);
+    }
+
+    public void undoLast() {
+      if (!history.isEmpty()) history.pop().undo();
+    }
+  }
+
+  Light light = new Light();
+  RemoteControl remote = new RemoteControl();
+  remote.press(new LightOnCommand(light));
+  remote.undoLast();`,
+      },
+      {
+      title: "Quick Cheat Sheet",
+      tag: "Summary",
+      keyPoints: [
+        "Singleton: one instance",
+        "Factory: create without direct new",
+        "Builder: fluent object construction",
+        "Adapter/Decorator/Facade: fit, extend, simplify",
+        "Observer/Strategy/Command: notify, swap, encapsulate actions",
+      ],
+      interview: `"If asked quickly, map each pattern to its one-liner and benefit. That shows conceptual clarity and practical decision-making in interviews."`,
+      code: `| Pattern   | One-liner                         | Key benefit                            |
+  |-----------|-----------------------------------|----------------------------------------|
+  | Singleton | One instance, always              | Shared state, resource control         |
+  | Factory   | Let a factory new for you         | Decouple creation from usage           |
+  | Builder   | Chain .set().set().build()        | Readable complex object construction   |
+  | Adapter   | Wrap to make compatible           | Reuse legacy code                      |
+  | Decorator | Wrap to add behavior              | Flexible feature layering              |
+  | Facade    | One method hides complexity       | Simpler API over messy internals       |
+  | Observer  | Subscribe and get notified        | Decoupled event handling               |
+  | Strategy  | Plug in any algorithm             | Swap logic at runtime                  |
+  | Command   | Package action as object          | Undo, queue, log actions               |
+
+  Click any pattern in the diagram above to go deeper on any one of them!`,
       },
     ],
   },
