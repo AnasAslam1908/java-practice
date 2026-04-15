@@ -1550,16 +1550,16 @@ if (s != null) {
     colorClass: "topic-patterns",
     sections: [
       {
-      title: "Design Patterns Visual Map",
-      tag: "All 9 Patterns",
-      keyPoints: [
-        "Creational: Singleton, Factory, Builder",
-        "Structural: Adapter, Decorator, Facade",
-        "Behavioral: Observer, Strategy, Command",
-        "Think in categories first, then select pattern by problem",
-      ],
-      interview: `"A clean way to explain design patterns is by category. Creational controls object creation, Structural composes objects, Behavioral manages communication. Then give one real use case per pattern."`,
-      code: `# Creational Patterns - How objects are created
+        title: "Design Patterns Visual Map",
+        tag: "All 9 Patterns",
+        keyPoints: [
+          "Creational: Singleton, Factory, Builder",
+          "Structural: Adapter, Decorator, Facade",
+          "Behavioral: Observer, Strategy, Command",
+          "Think in categories first, then select pattern by problem",
+        ],
+        interview: `"A clean way to explain design patterns is by category. Creational controls object creation, Structural composes objects, Behavioral manages communication. Then give one real use case per pattern."`,
+        code: `# Creational Patterns - How objects are created
   1) Singleton
   2) Factory
   3) Builder
@@ -1575,16 +1575,16 @@ if (s != null) {
   9) Command`,
       },
       {
-      title: "Singleton",
-      tag: "Creational",
+        title: "Singleton",
+        tag: "Creational",
         keyPoints: [
-        "Only one object of a class should ever exist",
-        "Private constructor prevents direct instantiation",
-        "Expose a global access method like getInstance()",
-        "Good for logger, config manager, and shared pools",
+          "Only one object of a class should ever exist",
+          "Private constructor prevents direct instantiation",
+          "Expose a global access method like getInstance()",
+          "Good for logger, config manager, and shared pools",
         ],
-      interview: `"Singleton means one instance, globally accessible. It centralizes shared state and prevents duplicate resource-heavy objects."`,
-      code: `public class DatabaseConnection {
+        interview: `"Singleton means one instance, globally accessible. It centralizes shared state and prevents duplicate resource-heavy objects."`,
+        code: `public class DatabaseConnection {
     private static DatabaseConnection instance;
 
     private DatabaseConnection() {}
@@ -1606,16 +1606,16 @@ if (s != null) {
   // db1 == db2 -> true`,
       },
       {
-      title: "Factory",
-      tag: "Creational",
+        title: "Factory",
+        tag: "Creational",
         keyPoints: [
-        "Create objects via a factory instead of calling new directly",
-        "Caller requests type; factory decides concrete class",
-        "Decouples creation logic from usage",
-        "Easy to extend with new implementations",
+          "Create objects via a factory instead of calling new directly",
+          "Caller requests type; factory decides concrete class",
+          "Decouples creation logic from usage",
+          "Easy to extend with new implementations",
         ],
-      interview: `"Factory lets code ask for what it needs without knowing construction details. This keeps business logic cleaner and open for extension."`,
-      code: `interface Animal {
+        interview: `"Factory lets code ask for what it needs without knowing construction details. This keeps business logic cleaner and open for extension."`,
+        code: `interface Animal {
     void speak();
 }
 
@@ -1641,16 +1641,16 @@ if (s != null) {
   a.speak();`,
       },
       {
-      title: "Builder",
-      tag: "Creational",
-      keyPoints: [
-        "Build complex objects step by step",
-        "Best when many optional fields are present",
-        "Improves readability over long constructors",
-        "Supports fluent chaining",
-      ],
-      interview: `"Builder avoids telescoping constructors. It gives readable, chainable object construction with clear defaults and optional fields."`,
-      code: `class Pizza {
+        title: "Builder",
+        tag: "Creational",
+        keyPoints: [
+          "Build complex objects step by step",
+          "Best when many optional fields are present",
+          "Improves readability over long constructors",
+          "Supports fluent chaining",
+        ],
+        interview: `"Builder avoids telescoping constructors. It gives readable, chainable object construction with clear defaults and optional fields."`,
+        code: `class Pizza {
     String size, crust, sauce, topping;
 
     private Pizza(Builder b) {
@@ -1677,16 +1677,16 @@ if (s != null) {
     .build();`,
       },
       {
-      title: "Adapter",
-      tag: "Structural",
+        title: "Adapter",
+        tag: "Structural",
         keyPoints: [
-        "Converts incompatible interfaces to work together",
-        "Wraps legacy or third-party classes",
-        "Acts as a bridge between expected and existing APIs",
-        "Promotes reuse without modifying old code",
+          "Converts incompatible interfaces to work together",
+          "Wraps legacy or third-party classes",
+          "Acts as a bridge between expected and existing APIs",
+          "Promotes reuse without modifying old code",
         ],
-      interview: `"Adapter is like a plug converter. It lets existing incompatible classes work with new code by translating calls."`,
-      code: `class OldPrinter {
+        interview: `"Adapter is like a plug converter. It lets existing incompatible classes work with new code by translating calls."`,
+        code: `class OldPrinter {
     public void printDocument(String text) {
       System.out.println("OLD: " + text);
     }
@@ -1710,16 +1710,16 @@ if (s != null) {
   printer.print("Hello");`,
       },
       {
-      title: "Decorator",
-      tag: "Structural",
-      keyPoints: [
-        "Adds behavior by wrapping objects",
-        "No need to modify original class",
-        "Multiple decorators can be stacked",
-        "Flexible alternative to deep inheritance trees",
-      ],
-      interview: `"Decorator enhances objects at runtime by wrapping them. It is perfect when you want feature combinations without creating many subclasses."`,
-      code: `interface Coffee {
+        title: "Decorator",
+        tag: "Structural",
+        keyPoints: [
+          "Adds behavior by wrapping objects",
+          "No need to modify original class",
+          "Multiple decorators can be stacked",
+          "Flexible alternative to deep inheritance trees",
+        ],
+        interview: `"Decorator enhances objects at runtime by wrapping them. It is perfect when you want feature combinations without creating many subclasses."`,
+        code: `interface Coffee {
     String getDescription();
     double getCost();
   }
@@ -1748,16 +1748,16 @@ if (s != null) {
   System.out.println(c.getCost());`,
       },
       {
-      title: "Facade",
-      tag: "Structural",
-      keyPoints: [
-        "Provides one simplified API over a complex subsystem",
-        "Reduces client-side complexity and coupling",
-        "Useful for onboarding and service boundaries",
-        "Client calls one method instead of many",
-      ],
-      interview: `"Facade is a front desk for a complex subsystem. It hides coordination details and gives callers a clean, simple entry point."`,
-      code: `class CPU { public void start() { System.out.println("CPU started"); } }
+        title: "Facade",
+        tag: "Structural",
+        keyPoints: [
+          "Provides one simplified API over a complex subsystem",
+          "Reduces client-side complexity and coupling",
+          "Useful for onboarding and service boundaries",
+          "Client calls one method instead of many",
+        ],
+        interview: `"Facade is a front desk for a complex subsystem. It hides coordination details and gives callers a clean, simple entry point."`,
+        code: `class CPU { public void start() { System.out.println("CPU started"); } }
   class Memory { public void load() { System.out.println("Memory loaded"); } }
   class HardDrive { public void read() { System.out.println("HDD reading"); } }
 
@@ -1777,16 +1777,16 @@ if (s != null) {
   new ComputerFacade().startComputer();`,
       },
       {
-      title: "Observer",
-      tag: "Behavioral",
-      keyPoints: [
-        "Subscribers get updates when publisher state changes",
-        "Decouples event producer from event consumers",
-        "Great for notifications and event-driven workflows",
-        "Supports dynamic subscribe/unsubscribe",
-      ],
-      interview: `"Observer enables publish-subscribe communication. When the subject changes, all subscribers are notified automatically without tight coupling."`,
-      code: `import java.util.*;
+        title: "Observer",
+        tag: "Behavioral",
+        keyPoints: [
+          "Subscribers get updates when publisher state changes",
+          "Decouples event producer from event consumers",
+          "Great for notifications and event-driven workflows",
+          "Supports dynamic subscribe/unsubscribe",
+        ],
+        interview: `"Observer enables publish-subscribe communication. When the subject changes, all subscribers are notified automatically without tight coupling."`,
+        code: `import java.util.*;
 
   interface Observer {
     void update(String event);
@@ -1817,16 +1817,16 @@ if (s != null) {
   channel.publish("New video uploaded!");`,
       },
       {
-      title: "Strategy",
-      tag: "Behavioral",
-      keyPoints: [
-        "Encapsulates interchangeable algorithms",
-        "Choose algorithm at runtime",
-        "Client code stays unchanged while behavior swaps",
-        "Common in sorting, pricing, payment, and validation",
-      ],
-      interview: `"Strategy separates algorithm from client code. You can swap behavior at runtime without changing the object that uses it."`,
-      code: `interface SortStrategy {
+        title: "Strategy",
+        tag: "Behavioral",
+        keyPoints: [
+          "Encapsulates interchangeable algorithms",
+          "Choose algorithm at runtime",
+          "Client code stays unchanged while behavior swaps",
+          "Common in sorting, pricing, payment, and validation",
+        ],
+        interview: `"Strategy separates algorithm from client code. You can swap behavior at runtime without changing the object that uses it."`,
+        code: `interface SortStrategy {
     void sort(int[] data);
   }
 
@@ -1852,16 +1852,16 @@ if (s != null) {
   sorter.sort(new int[]{5, 3, 1});`,
       },
       {
-      title: "Command",
-      tag: "Behavioral",
-      keyPoints: [
-        "Wraps requests as objects",
-        "Supports undo, queueing, logging, and delayed execution",
-        "Decouples invoker from receiver",
-        "Useful in UI actions and job schedulers",
-      ],
-      interview: `"Command packages an action into an object. This makes operations replayable, undoable, and schedulable while keeping invoker and receiver decoupled."`,
-      code: `import java.util.Stack;
+        title: "Command",
+        tag: "Behavioral",
+        keyPoints: [
+          "Wraps requests as objects",
+          "Supports undo, queueing, logging, and delayed execution",
+          "Decouples invoker from receiver",
+          "Useful in UI actions and job schedulers",
+        ],
+        interview: `"Command packages an action into an object. This makes operations replayable, undoable, and schedulable while keeping invoker and receiver decoupled."`,
+        code: `import java.util.Stack;
 
   interface Command {
     void execute();
@@ -1899,17 +1899,17 @@ if (s != null) {
   remote.undoLast();`,
       },
       {
-      title: "Quick Cheat Sheet",
-      tag: "Summary",
-      keyPoints: [
-        "Singleton: one instance",
-        "Factory: create without direct new",
-        "Builder: fluent object construction",
-        "Adapter/Decorator/Facade: fit, extend, simplify",
-        "Observer/Strategy/Command: notify, swap, encapsulate actions",
-      ],
-      interview: `"If asked quickly, map each pattern to its one-liner and benefit. That shows conceptual clarity and practical decision-making in interviews."`,
-      code: `| Pattern   | One-liner                         | Key benefit                            |
+        title: "Quick Cheat Sheet",
+        tag: "Summary",
+        keyPoints: [
+          "Singleton: one instance",
+          "Factory: create without direct new",
+          "Builder: fluent object construction",
+          "Adapter/Decorator/Facade: fit, extend, simplify",
+          "Observer/Strategy/Command: notify, swap, encapsulate actions",
+        ],
+        interview: `"If asked quickly, map each pattern to its one-liner and benefit. That shows conceptual clarity and practical decision-making in interviews."`,
+        code: `| Pattern   | One-liner                         | Key benefit                            |
   |-----------|-----------------------------------|----------------------------------------|
   | Singleton | One instance, always              | Shared state, resource control         |
   | Factory   | Let a factory new for you         | Decouple creation from usage           |
@@ -2264,42 +2264,46 @@ public class JwtService {
         title: "Spring Data JPA",
         tag: "Database Layer",
         keyPoints: [
-          "@Entity maps class to DB table; @Id is primary key",
-          "Extend JpaRepository for free CRUD operations",
-          "Derived query methods from method names",
-          "@Transactional ensures atomicity — rollback on exception",
+          "Spring Data JPA removes repetitive DAO boilerplate on top of JPA and Hibernate",
+          "@Entity maps a class to a table and @Id marks the primary key",
+          "JpaRepository gives you CRUD methods without writing implementation code",
+          "Derived query methods generate SQL from method names",
+          "@Transactional makes a method atomic and rolls back on runtime exceptions",
         ],
-        interview: `"Spring Data JPA eliminates boilerplate DAO code. Extend JpaRepository for free CRUD. Method names become queries automatically. @Transactional wraps in DB transaction — if anything throws, everything rolls back."`,
+        interview: `"When you build a Java app that talks to a database, you normally have to write a lot of repetitive code — open a connection, write SQL, map result rows to Java objects, close the connection, handle exceptions. This is called the DAO (Data Access Object) layer, and it's mostly boilerplate.
+Spring Data JPA eliminates almost all of it. It sits on top of JPA (Java Persistence API) and Hibernate, and gives you a way to interact with your database using nothing but interfaces and method names. 
+JpaRepository — You create an interface that extends JpaRepository<User, Long>. You write zero implementation code. Spring generates it at runtime. You immediately get save(), findById(), findAll(), deleteById(), count(), and more — all working SQL queries, for free."`,
         code: `@Entity
-@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(unique = true, nullable = false)
+    private String name;
     private String email;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private String city;
+    private int age;
 }
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    List<User> findByNameContainingIgnoreCase(String name);
-
-    @Query("SELECT u FROM User u WHERE u.active = true")
-    List<User> findActiveUsers();
+    List<User> findByNameAndCity(String name, String city);
+    List<User> findByAgeGreaterThan(int age);
 }
 
 @Service
-public class OrderService {
-    @Transactional  // all-or-nothing
-    public Order placeOrder(OrderRequest req) {
-        Order order = orderRepo.save(new Order(req));
-        inventoryService.reduce(req.getProductId(), req.getQuantity());
-        emailService.sendConfirmation(order);
-        return order; // if email fails, order rolls back
+public class TransferService {
+    @Transactional
+    public void transfer(Long fromId, Long toId, double amount) {
+        debit(fromId, amount);
+        credit(toId, amount);
+    }
+
+    private void debit(Long accountId, double amount) {
+        // deduct money
+    }
+
+    private void credit(Long accountId, double amount) {
+        // add money
     }
 }`,
       },
@@ -2404,36 +2408,74 @@ public class GlobalExceptionHandler {
         title: "Spring vs SpringBoot",
         tag: "Comparison",
         keyPoints: [
-          "Spring Framework is lightweight IoC container for dependency injection",
-          "Spring Boot removes boilerplate — auto-config, starter POMs, embedded server",
-          "Spring requires manual setup: web.xml, dispatcher servlet, bean definitions",
-          "Spring Boot uses @SpringBootApplication for zero-config deployment",
-          "Spring Boot packages everything into a fat JAR (app + Tomcat inside)",
+          "Spring gives you enterprise building blocks but requires manual configuration",
+          "Spring core is the IoC container: it creates, wires, and manages bean lifecycle",
+          "Spring Boot wraps Spring with smart defaults and convention-over-configuration",
+          "Boot adds auto-configuration, starter POMs, and embedded server support",
+          "@SpringBootApplication = @Configuration + @ComponentScan + @EnableAutoConfiguration",
+          "Spring Boot does not replace Spring; it removes XML and boilerplate setup",
         ],
-        interview: `"Spring Framework is the foundation. It provides IoC, AOP, MVC. Spring Boot wraps Spring and adds auto-configuration to eliminate boilerplate. Without Boot, you'd manually configure servlets, listeners, and beans in XML. Boot does all that automatically based on classpath."`,
-        code: `// Spring Framework - Manual setup
-<!-- web.xml (traditional) -->
-<servlet>
-    <servlet-name>dispatcher</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <init-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:applicationContext.xml</param-value>
-    </init-param>
-</servlet>
+        interview: `"Spring Boot is an opinionated layer on top of the Spring framework. Spring itself is powerful but requires a lot of manual configuration — you have to wire your beans, configure a datasource, and set up your server. At the core of Spring is the IoC container, which creates and manages beans and injects dependencies. Spring Boot removes overhead through three mechanisms: auto-configuration, which detects your classpath and creates beans automatically; starter POMs, which bundle compatible dependencies under one import; and an embedded server, so your app ships as a runnable JAR with Tomcat inside. You can always override any default in application.properties.
 
-<!-- applicationContext.xml -->
-<bean id="userService" class="com.example.UserService"/>
+Spring is the core framework — it handles dependency injection, AOP, data access, and MVC. Spring Boot is a way to use Spring without the setup cost. In plain Spring you configure everything explicitly. In Spring Boot, convention-over-configuration applies — it guesses what you need from the classpath and auto-wires it. The main practical difference is that Spring Boot apps run as fat JARs with an embedded server, while traditional Spring apps are WAR files deployed to an external Tomcat.
 
-// Spring Boot - Zero config
-@SpringBootApplication
-public class MyApp {
-    public static void main(String[] args) {
-        SpringApplication.run(MyApp.class, args);
-    }
-}
+Bonus point: Spring Boot doesn't hide Spring — you're still writing @Service, @Repository, and @Autowired. It just removes the XML and the boilerplate config that used to surround them."`,
+        code: `Spring vs Spring Boot
 
-// One line runs everything: configures servlet, detects beans, starts Tomcat`,
+What is Spring?
+Spring is a Java framework that gives you the building blocks to write enterprise applications — things like dependency injection, transaction management, and web MVC. The heart of Spring is its IoC container (Inversion of Control), which creates objects (beans), wires dependencies, and manages bean lifecycle. But it does nothing automatically. You have to configure everything yourself: declare your beans, set up your datasource, tell it which packages to scan, deploy your WAR file to an external Tomcat server.
+It gives you full control, but at the cost of a lot of boilerplate setup.
+
+What is Spring Boot?
+Spring Boot is built on top of Spring. It doesn't replace Spring — it wraps it with smart defaults so you don't have to configure everything from scratch.
+
+Three things it adds:
+1) Auto-configuration
+Spring Boot looks at what's on your classpath and creates beans automatically.
+If it sees spring-data-jpa, it creates an EntityManagerFactory for you.
+If it sees spring-web, it sets up a DispatcherServlet.
+
+2) Starter POMs
+Instead of adding many separate dependencies and worrying about version conflicts,
+you add one starter like spring-boot-starter-web and it pulls in Spring MVC,
+Jackson, Tomcat — all at tested, compatible versions.
+
+3) Embedded server
+Tomcat is packaged inside your JAR. You run:
+java -jar app.jar
+No external server, no WAR deployment. This is why Spring Boot is the default
+choice for microservices and Docker containers.
+
+The entry point annotation @SpringBootApplication is a shortcut for:
+@Configuration + @ComponentScan + @EnableAutoConfiguration.
+
+Key difference in one line:
+Spring gives you tools. Spring Boot gives you a working app with sensible defaults
+and you override only what you need via application.properties.
+
+Interview answer: "What is Spring Boot?"
+"Spring Boot is an opinionated layer on top of the Spring framework. Spring itself
+is powerful but requires a lot of manual configuration — you have to wire your
+beans, configure a datasource, and set up your server. At the core of Spring is
+the IoC container, which creates and manages beans and injects dependencies.
+Spring Boot removes that
+overhead through three mechanisms: auto-configuration, which detects your classpath
+and creates beans automatically; starter POMs, which bundle compatible dependencies
+under one import; and an embedded server, so your app ships as a runnable JAR with
+Tomcat inside. You can always override any default in application.properties."
+
+Interview answer: "What's the difference between Spring and Spring Boot?"
+"Spring is the core framework — it handles dependency injection, AOP, data access,
+and MVC. Spring Boot is a way to use Spring without the setup cost. In plain Spring
+you configure everything explicitly. In Spring Boot, convention-over-configuration
+applies — it guesses what you need from the classpath and auto-wires it. The main
+practical difference is that Spring Boot apps run as fat JARs with an embedded
+server, while traditional Spring apps are WAR files deployed to an external Tomcat."
+
+Bonus depth point:
+"Spring Boot doesn't hide Spring — you're still writing @Service, @Repository,
+@Autowired. It just removes the XML and the boilerplate config that used to
+surround them."`,
       },
       {
         title: "Hibernate",
@@ -2498,7 +2540,8 @@ public class ProductService {
           "@Entity marks class as database table, @Id as primary key",
           "Relationships: @OneToOne, @OneToMany, @ManyToMany",
         ],
-        interview: `"ORM bridges object-oriented code with relational databases. Instead of writing SQL, you define @Entity classes with relationships, and framework handles SQL generation. Hibernate is the de-facto standard impl of JPA."`,
+        interview: `"ORM stands for Object-Relational Mapping. It's a technique that lets you interact with a relational database using Java objects instead of writing raw SQL.
+Your Java class becomes a table. Your object becomes a row. Your fields become columns. The ORM framework handles the SQL in the background."`,
         code: `@Entity
 @Table(name = "users")
 public class User {
