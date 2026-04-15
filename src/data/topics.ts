@@ -3611,39 +3611,178 @@ WHERE order_status = 'SHIPPED'
           "Denormalize strategically for read-heavy workloads",
         ],
         interview: `"Normalization reduces data redundancy. 1NF means atomic values. 2NF eliminates partial dependencies. 3NF removes transitive dependencies. In practice, I normalize for write-heavy systems and denormalize for read-heavy ones — it's a trade-off between consistency and performance."`,
-        code: `-- UNNORMALIZED (bad)
--- | order_id | customer | items           |
--- | 1        | John     | iPhone, AirPods |
+        code: `Here's a proper real-world example going through all 3 Normal Forms step by step:
 
--- 1NF: Atomic values, no repeating groups
-CREATE TABLE orders_1nf (
-    order_id INT,
-    customer VARCHAR(100),
-    item VARCHAR(100),
-    PRIMARY KEY (order_id, item)
-);
+    ---
 
--- 2NF: Remove partial dependencies
-CREATE TABLE customers (
-    id INT PRIMARY KEY,
-    name VARCHAR(100)
-);
+    ## UNNORMALIZED (0NF) — Raw Data
 
-CREATE TABLE orders_2nf (
-    id INT PRIMARY KEY,
-    customer_id INT REFERENCES customers(id)
-);
+    | order_id | customer_name | customer_email | items | prices | city | zip |
+    |---|---|---|---|---|---|---|
+    | 1 | John | john@gmail.com | iPhone, AirPods | 999, 199 | New York | 10001 |
+    | 2 | Sara | sara@gmail.com | MacBook | 1299 | Boston | 02101 |
 
-CREATE TABLE order_items (
-    order_id INT REFERENCES orders_2nf(id),
-    item VARCHAR(100),
-    price DECIMAL(10,2),
-    PRIMARY KEY (order_id, item)
-);
+    **Problems:**
+    - ❌ Multiple values in one column (items, prices)
+    - ❌ Repeated customer data
+    - ❌ City depends on zip, not order
 
--- 3NF: Remove transitive dependencies
--- Bad: orders has zip_code AND city (city depends on zip)
--- Fix: separate address table`,
+    ---
+
+    ## 1NF — Atomic Values, No Repeating Groups
+
+    **Rule: Each cell must have ONE value only**
+
+    \`\`\`sql
+    CREATE TABLE orders_1nf (
+      order_id        INT,
+      customer_name   VARCHAR(100),
+      customer_email  VARCHAR(100),
+      item            VARCHAR(100),   -- split iPhone, AirPods into separate rows
+      price           DECIMAL(10,2),
+      city            VARCHAR(100),
+      zip             VARCHAR(10),
+      PRIMARY KEY (order_id, item)    -- composite PK
+    );
+    \`\`\`
+
+    | order_id | customer_name | customer_email | item | price | city | zip |
+    |---|---|---|---|---|---|---|
+    | 1 | John | john@gmail.com | iPhone | 999 | New York | 10001 |
+    | 1 | John | john@gmail.com | AirPods | 199 | New York | 10001 |
+    | 2 | Sara | sara@gmail.com | MacBook | 1299 | Boston | 02101 |
+
+    **Fixed:** ✅ Atomic values
+    **Problems still:**
+    - ❌ customer_name, customer_email, city, zip repeated for every item
+    - ❌ customer_name depends only on order_id, not on item (partial dependency)
+
+    ---
+
+    ## 2NF — Remove Partial Dependencies
+
+    **Rule: Every non-key column must depend on the WHOLE primary key, not part of it**
+
+    > Since PK is (order_id, item) — customer_name depends only on order_id, not item — that's a **partial dependency**, fix it!
+
+    \`\`\`sql
+    -- Customer table
+    CREATE TABLE customers (
+      customer_id     INT PRIMARY KEY,
+      customer_name   VARCHAR(100),
+      customer_email  VARCHAR(100),
+      city            VARCHAR(100),
+      zip             VARCHAR(10)
+    );
+
+    -- Orders table (depends fully on order_id)
+    CREATE TABLE orders_2nf (
+      order_id    INT PRIMARY KEY,
+      customer_id INT,
+      FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    );
+
+    -- Order Items (depends on BOTH order_id + item = full PK)
+    CREATE TABLE order_items_2nf (
+      order_id    INT,
+      item        VARCHAR(100),
+      price       DECIMAL(10,2),
+      PRIMARY KEY (order_id, item),
+      FOREIGN KEY (order_id) REFERENCES orders_2nf(order_id)
+    );
+    \`\`\`
+
+    **customers:**
+    | customer_id | customer_name | customer_email | city | zip |
+    |---|---|---|---|---|
+    | 1 | John | john@gmail.com | New York | 10001 |
+    | 2 | Sara | sara@gmail.com | Boston | 02101 |
+
+    **orders_2nf:**
+    | order_id | customer_id |
+    |---|---|
+    | 1 | 1 |
+    | 2 | 2 |
+
+    **order_items_2nf:**
+    | order_id | item | price |
+    |---|---|---|
+    | 1 | iPhone | 999 |
+    | 1 | AirPods | 199 |
+    | 2 | MacBook | 1299 |
+
+    **Fixed:** ✅ No partial dependencies
+    **Problem still:**
+    - ❌ In customers table — city depends on zip, not on customer_id (transitive dependency)
+
+    ---
+
+    ## 3NF — Remove Transitive Dependencies
+
+    **Rule: Non-key columns must depend ONLY on the primary key, not on other non-key columns**
+
+    > city depends on zip, and zip depends on customer_id — that's a **transitive dependency**, fix it!
+
+    \`\`\`sql
+    -- Address/zip table (city depends on zip, not customer)
+    CREATE TABLE zip_codes (
+      zip     VARCHAR(10) PRIMARY KEY,
+      city    VARCHAR(100)
+    );
+
+    -- Customer table (no transitive dependency now)
+    CREATE TABLE customers_3nf (
+      customer_id     INT PRIMARY KEY,
+      customer_name   VARCHAR(100),
+      customer_email  VARCHAR(100),
+      zip             VARCHAR(10),
+      FOREIGN KEY (zip) REFERENCES zip_codes(zip)
+    );
+
+    -- Orders table
+    CREATE TABLE orders_3nf (
+      order_id    INT PRIMARY KEY,
+      customer_id INT,
+      FOREIGN KEY (customer_id) REFERENCES customers_3nf(customer_id)
+    );
+
+    -- Order Items table
+    CREATE TABLE order_items_3nf (
+      order_id    INT,
+      item        VARCHAR(100),
+      price       DECIMAL(10,2),
+      PRIMARY KEY (order_id, item),
+      FOREIGN KEY (order_id) REFERENCES orders_3nf(order_id)
+    );
+    \`\`\`
+
+    **zip_codes:**
+    | zip | city |
+    |---|---|
+    | 10001 | New York |
+    | 02101 | Boston |
+
+    **customers_3nf:**
+    | customer_id | customer_name | customer_email | zip |
+    |---|---|---|---|
+    | 1 | John | john@gmail.com | 10001 |
+    | 2 | Sara | sara@gmail.com | 02101 |
+
+    ---
+
+    ## Full Summary
+
+    \`\`\`
+    0NF  →  1NF  :  Split multi-values into separate rows (atomic)
+    1NF  →  2NF  :  Remove partial dependencies (split customer out)
+    2NF  →  3NF  :  Remove transitive dependencies (split zip/city out)
+    \`\`\`
+
+    | Normal Form | Problem Solved | Table Affected |
+    |---|---|---|
+    | **1NF** | iPhone, AirPods → separate rows | orders_1nf |
+    | **2NF** | customer info repeated per item | customers, orders, order_items |
+    | **3NF** | city depending on zip not customer | zip_codes, customers |`,
       },
       {
         title: "ACID Properties",
